@@ -2,6 +2,7 @@
   "streamers": {
     "demostreamer": {
       "displayName": "demostreamer",
+      "trigger": "!raid",
       "publicKey": {
         "kty": "EC",
         "crv": "P-384",

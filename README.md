@@ -15,10 +15,11 @@ Guide pas à pas sans jargon, hébergé sur GitHub Pages :
 1. **Clés** — chaque streamer a une paire ECDSA P-384. La **privée** reste sur
    son PC (`cli/keys/`). La **publique** (JWK) est publiée dans
    `public/streamers.json`.
-2. **Signature** — le CLI crée un payload `{ url, exp, streamer }`, le signe,
-   et affiche `!raid <token>` à coller dans le chat Twitch.
-3. **Lecture chat** — l’extension observe le DOM Twitch (MutationObserver),
-   détecte `!raid …` par regex (pas de confiance aveugle au CSS).
+2. **Signature** — l’assistant local (ou le CLI) crée un payload
+   `{ url, exp, streamer }`, le signe, et copie
+   `<trigger> <token>` (défaut `!raid`) dans le presse-papiers.
+3. **Lecture chat** — l’extension détecte le **trigger** déclaré pour la
+   chaîne dans `streamers.json` (champ `trigger`, défaut `!raid`).
 4. **Vérifications** (toutes obligatoires) :
    - le login de la page = `streamer` du payload ;
    - signature valide avec **sa** clé publique ;
@@ -56,11 +57,15 @@ node cli/generate-keys.js monpseudo
 #   "streamers": {
 #     "monpseudo": {
 #       "displayName": "MonPseudo",
+#       "trigger": "!raid",
 #       "publicKey": { "kty": "EC", "crv": "P-384", "x": "...", "y": "..." }
 #     }
 #   }
 # }
 ```
+
+Tu peux changer `"trigger": "!go"` (ou autre mot **sans espace**).  
+Même valeur dans l’assistant local / `cli/t2k.config.json`.
 
 La clé privée est dans `cli/keys/monpseudo_private.pem` — **jamais** commitée
 (`.gitignore`).
@@ -97,19 +102,22 @@ couvre déjà GitHub Pages).
 2. Active le **mode développeur**
 3. **Charger l’extension non empaquetée** → dossier `extension/`
 
-### F. Lancer un raid
+### F. Lancer un raid (assistant local — recommandé)
+
+1. Double-clic sur **`T2K-Raid.bat`** (ou `npm start`)
+2. Le navigateur s’ouvre : renseigne login, **trigger**, URL Kick
+3. **Signer & copier** → colle (Ctrl+V) dans le chat Twitch
+
+Le trigger choisi doit être **identique** au champ `"trigger"` de ton entrée
+dans `public/streamers.json` (sinon les viewers ne détectent rien).
+
+En ligne de commande (équivalent) :
 
 ```bash
-# Sur le PC qui a la clé privée
-node cli/sign-raid.js monpseudo "https://kick.com/cible" --ttl 60
+node cli/sign-raid.js monpseudo "https://kick.com/cible" --ttl 60 --trigger "!raid"
 ```
 
-1. Copie la ligne `!raid …` affichée
-2. Sur `https://www.twitch.tv/monpseudo`, colle-la dans le chat
-3. Les viewers avec T2K voient la bannière → redirect (ou Escape pour annuler)
-
-`--ttl` max **180** secondes (sinon le token est immédiatement hors fenêtre
-côté extension).
+`--ttl` max **180** secondes.
 
 ## Checklist de vérif rapide
 
@@ -119,6 +127,7 @@ côté extension).
 | Escape / Annuler | Pas de redirect |
 | Même signature rejouée / enveloppe mutée | Ignoré |
 | Mauvaise chaîne Twitch | Ignoré |
+| Trigger différent du JSON | Ignoré |
 | Token expiré | Ignoré |
 | URL `http://` | Rejeté par le CLI |
 | JSON injoignable (CORS / offline) | Silence, pas de crash |
@@ -126,12 +135,19 @@ côté extension).
 ## CLI (référence)
 
 ```bash
+npm start
+# ou
+node cli/raid-app.js
+
 node cli/generate-keys.js <streamer_login>
-node cli/sign-raid.js <streamer_login> <https_url> [--ttl 60]
+node cli/sign-raid.js [login] [https_url] [--ttl 60] [--trigger "!raid"]
 ```
 
+Config locale (gitignorée) : `cli/t2k.config.json` — voir
+`cli/t2k.config.example.json`.
+
 - `generate-keys` **refuse** d’écraser une clé privée déjà présente
-- `sign-raid` ne fait **aucun** appel réseau
+- signature **sans** appel réseau
 
 ## Sécurité clés
 

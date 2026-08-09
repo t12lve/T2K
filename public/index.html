@@ -375,6 +375,7 @@ cd T2K</code></pre>
   "streamers": {
     "monpseudo": {
       "displayName": "MonPseudo",
+      "trigger": "!raid",
       "publicKey": {
         "kty": "EC",
         "crv": "P-384",
@@ -387,6 +388,8 @@ cd T2K</code></pre>
         <p class="muted">
           Le login (<code class="inline">monpseudo</code>) doit être
           <strong>exactement</strong> en minuscules, comme dans l’URL Twitch.
+          Tu peux changer <code class="inline">"trigger": "!go"</code> — même
+          valeur dans l’assistant T2K (voir plus bas).
         </p>
       </article>
 
@@ -425,26 +428,27 @@ cd T2K</code></pre>
       </article>
 
       <article class="step" id="etape-6">
-        <h3>Signe un raid et colle-le dans le chat</h3>
-        <p>Quand tu es prêt à raid :</p>
-        <pre><code>node cli/sign-raid.js monpseudo "https://kick.com/lacible" --ttl 60</code></pre>
-        <ul>
-          <li>L’URL doit commencer par <code class="inline">https://</code></li>
-          <li><code class="inline">--ttl 60</code> = le token reste utilisable ~1 minute
-            (max autorisé : 180 secondes)</li>
-        </ul>
-        <p>Le terminal affiche une seule ligne du genre :</p>
-        <pre><code>!raid eyJpIjoiLi4uIn0...</code></pre>
+        <h3>Signe un raid (assistant — le plus simple)</h3>
         <ol>
-          <li>Copie toute la ligne</li>
-          <li>Va sur <strong>ta</strong> chaîne Twitch</li>
-          <li>Colle-la dans le chat et envoie</li>
+          <li>Double-clic sur <code class="inline">T2K-Raid.bat</code>
+            (à la racine du projet) — ou lance <code class="inline">npm start</code></li>
+          <li>Une page s’ouvre dans le navigateur</li>
+          <li>Remplis : login Twitch, <strong>mot-clé / trigger</strong>, URL Kick</li>
+          <li>Clique <strong>Signer &amp; copier</strong></li>
+          <li>Sur ta chaîne Twitch, colle (Ctrl+V) et envoie</li>
         </ol>
         <p>
-          Les viewers qui ont T2K voient une bannière en bas :
-          « Raid T2K dans 3… ». S’ils ne font rien → redirection.
-          S’ils appuient sur <strong>Échap</strong> ou <strong>Annuler</strong> → rien ne se passe.
+          Les viewers qui ont T2K voient une bannière :
+          « Raid T2K dans 3… ». <strong>Échap</strong> ou <strong>Annuler</strong> = stop.
         </p>
+        <div class="callout">
+          Le <strong>trigger</strong> de l’assistant doit être le même que dans
+          <code class="inline">streamers.json</code>. Exemple :
+          <code class="inline">"trigger": "!go"</code> + champ trigger
+          <code class="inline">!go</code> dans l’UI.
+        </div>
+        <p class="muted">Variante terminal :</p>
+        <pre><code>node cli/sign-raid.js monpseudo "https://kick.com/lacible" --ttl 60 --trigger "!raid"</code></pre>
       </article>
     </section>
 
@@ -513,13 +517,15 @@ cd T2K</code></pre>
 ├── cli/                  ← outils sur TON PC
 │   ├── generate-keys.js
 │   ├── sign-raid.js
+│   ├── raid-app.js       ← assistant navigateur (npm start)
 │   └── keys/             ← SECRETS (jamais sur GitHub)
+├── T2K-Raid.bat          ← double-clic Windows
 ├── extension/            ← à charger dans Chrome
 │   ├── manifest.json
 │   └── content.js
 └── public/               ← site GitHub Pages (cette page + streamers.json)
     ├── index.html        ← ce tutoriel
-    └── streamers.json    ← clés publiques</code></pre>
+    └── streamers.json    ← clés publiques + trigger</code></pre>
       <p>
         Doc technique plus détaillée :
         <a href="https://github.com/t12lve/T2K">dépôt GitHub</a>

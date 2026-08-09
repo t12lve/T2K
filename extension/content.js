@@ -2,7 +2,7 @@
 
 const T2K_STREAMERS_URL =
   'https://t12lve.github.io/T2K/streamers.json';
-const T2K_RAID_RE = /!raid\s+([A-Za-z0-9_-]+={0,2})/;
+const T2K_DEFAULT_TRIGGER = '!raid';
 const T2K_TTL_SEC = 60;
 const T2K_DRIFT_SEC = 120;
 const T2K_BANNER_SEC = 3;
@@ -41,6 +41,17 @@ function t2kChannelLogin() {
 
 function t2kCanonicalPayload({ exp, streamer, url }) {
   return JSON.stringify({ exp, streamer, url });
+}
+
+function t2kEscapeRegExp(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function t2kTriggerForChannel() {
+  const login = t2kChannelLogin();
+  const entry = t2kStreamers && t2kStreamers[login];
+  const t = entry && typeof entry.trigger === 'string' ? entry.trigger.trim() : '';
+  return t || T2K_DEFAULT_TRIGGER;
 }
 
 async function t2kFetchStreamers() {
@@ -242,8 +253,13 @@ async function t2kHandleRaidToken(token) {
 }
 
 function t2kScanText(text) {
-  if (!text || text.indexOf('!raid') === -1) return;
-  const m = text.match(T2K_RAID_RE);
+  if (!text || !t2kStreamers) return;
+  const trigger = t2kTriggerForChannel();
+  if (!trigger || text.indexOf(trigger) === -1) return;
+  const re = new RegExp(
+    t2kEscapeRegExp(trigger) + '\\s+([A-Za-z0-9_-]+={0,2})'
+  );
+  const m = text.match(re);
   if (m) t2kHandleRaidToken(m[1]);
 }
 

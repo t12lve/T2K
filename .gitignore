@@ -5,6 +5,7 @@ yarn-error.log*
 
 # T2K secrets — NEVER commit private keys
 cli/keys/
+cli/t2k.config.json
 *.pem
 *private*
 private_key.json

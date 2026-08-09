@@ -48,6 +48,7 @@ console.log(
     {
       [login]: {
         displayName: login,
+        trigger: '!raid',
         publicKey: publicKeyOut,
       },
     },
@@ -55,3 +56,24 @@ console.log(
     2
   )
 );
+
+const cfgPath = path.join(__dirname, 't2k.config.json');
+if (!fs.existsSync(cfgPath)) {
+  fs.writeFileSync(
+    cfgPath,
+    JSON.stringify(
+      {
+        streamer: login,
+        trigger: '!raid',
+        ttl: 60,
+        lastUrl: 'https://kick.com/',
+        port: 3847,
+      },
+      null,
+      2
+    ) + '\n',
+    { mode: 0o600 }
+  );
+  console.log(`Created ${cfgPath} — edit "trigger" if you want another keyword.`);
+}
+console.log('UI: double-click T2K-Raid.bat  or  npm start');
