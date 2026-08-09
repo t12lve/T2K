@@ -1,11 +1,20 @@
 {
   "manifest_version": 3,
   "name": "T2K",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Twitch To Kick — le streamer colle une phrase, les viewers suivent vers Kick",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
   "action": {
     "default_title": "T2K — phrase raid",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png"
+    }
   },
   "host_permissions": ["https://www.twitch.tv/*"],
   "content_scripts": [
