@@ -1,0 +1,13 @@
+{
+  "streamers": {
+    "example": {
+      "displayName": "ExampleStreamer",
+      "publicKey": {
+        "kty": "EC",
+        "crv": "P-384",
+        "x": "REPLACE_AFTER_generate-keys",
+        "y": "REPLACE_AFTER_generate-keys"
+      }
+    }
+  }
+}

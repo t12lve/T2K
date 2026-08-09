@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# T2K secrets — NEVER commit private keys
+cli/keys/
+*.pem
+*private*
+private_key.json
+*_private.json
+
+# Env
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.idea/
+.vscode/
+*.swp
