@@ -200,12 +200,6 @@ async function t2kHandleRaidToken(token) {
     return;
   }
 
-  if (!t2kInReplayWindow(exp)) {
-    t2kDebug('expired/out of window');
-    return;
-  }
-  if (!t2kIsHttpsUrl(url)) return;
-
   let ok = false;
   try {
     const key = await t2kImportPublicKey(entry.publicKey);
@@ -222,6 +216,12 @@ async function t2kHandleRaidToken(token) {
   }
   if (!ok) return;
 
+  if (!t2kInReplayWindow(exp)) {
+    t2kDebug('expired/out of window');
+    return;
+  }
+  if (!t2kIsHttpsUrl(url)) return;
+
   t2k_processed_raids.add(token);
   t2kShowBanner(url);
 }
@@ -233,7 +233,7 @@ function t2kScanText(text) {
 }
 
 function t2kObserveChat() {
-  const root = document.querySelector('main') || document.body;
+  const root = document.documentElement || document.body;
   const obs = new MutationObserver((mutations) => {
     for (const mut of mutations) {
       for (const node of mut.addedNodes) {
