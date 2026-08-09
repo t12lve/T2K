@@ -359,17 +359,27 @@
 
       if (step === 1) {
         return head + `
-          <h2>Deux rôles</h2>
+          <h2>Deux rôles (+ le registre)</h2>
           <p class="lead">Tout le monde n’a pas la même chose à installer.</p>
           <div class="split">
             <div class="tile tile-twitch">
               <h3>Toi (streamer)</h3>
-              <p>Cet assistant + clé privée + publication de ta clé publique + coller la commande sur Twitch.</p>
+              <p>Cet assistant + clé <strong>privée</strong> sur ton PC + envoi de ta clé <strong>publique</strong> au registre + coller la commande sur Twitch.</p>
             </div>
             <div class="tile tile-kick">
               <h3>Tes viewers</h3>
               <p>Ils installent seulement l’extension Chrome T2K. Pas de Node, pas de clés.</p>
             </div>
+          </div>
+          <div class="tile tile-twitch" style="margin-top:0.75rem;">
+            <h3>Le registre T2K (obligatoire)</h3>
+            <p>
+              L’extension charge un seul fichier officiel :
+              <code>streamers.json</code> sur GitHub Pages.
+              <strong>Seul le mainteneur du projet</strong> y ajoute les clés publiques.
+              Sans ça, tes raids signés ne seront jamais reconnus par les viewers.
+              Tu n’envoies <em>jamais</em> ta clé privée — uniquement le JSON public généré à l’étape suivante.
+            </p>
           </div>
           <div class="actions">
             <button type="button" class="btn-ghost" id="back">Retour</button>
@@ -406,12 +416,17 @@
       }
 
       if (step === 4) {
-        const hasKey = false;
         return head + `
           <h2>Créer ta clé secrète</h2>
           <p class="lead">
-            Analogie : la clé privée = ton tampon officiel.
-            Elle reste sur <strong>ce PC</strong>. Ne l’envoie à personne.
+            Analogie : la clé <strong>privée</strong> = ton tampon officiel.
+            Elle reste sur <strong>ce PC</strong>. <strong>Ne l’envoie à personne</strong>
+            (pas même au registre T2K).
+          </p>
+          <p class="hint">
+            Ensuite on génère aussi une clé <strong>publique</strong> : c’est uniquement
+            celle-là que tu enverras au mainteneur pour être ajouté à
+            <code>streamers.json</code>.
           </p>
           <button type="button" class="btn-bridge" id="genKeys">Générer ma paire de clés</button>
           <pre class="code hidden" id="jwkBox"></pre>
@@ -434,21 +449,45 @@
   }
 }`;
         return head + `
-          <h2>Publier ta clé (vers Kick & viewers)</h2>
+          <h2>Envoie ta clé publique au registre</h2>
           <p class="lead">
-            Colle ce bloc dans <code>public/streamers.json</code>, pousse sur GitHub,
-            puis l’extension téléchargera ta clé depuis Pages.
+            L’extension T2K ne fait confiance qu’au fichier officiel
+            <code>streamers.json</code> (GitHub Pages du projet).
+            <strong>Tu ne peux pas t’auto-publier</strong> : le mainteneur doit
+            ajouter ton entrée. C’est lui le « registre / validateur » de la liste —
+            la crypto prouve ensuite que <em>tes</em> raids viennent bien de <em>ta</em> clé.
           </p>
+          <div class="tile tile-kick" style="margin-bottom:0.85rem;">
+            <h3>Pourquoi partager cette clé UNIQUEMENT avec le registre ?</h3>
+            <p>
+              Le JSON ci-dessous est ta clé <strong>publique</strong> (pas un secret de signature).
+              En revanche, elle doit aller <strong>uniquement</strong> au mainteneur T2K
+              (<a href="mailto:2hellv@gmail.com">2hellv@gmail.com</a>) pour qu’il l’insère
+              dans le registre officiel des viewers.
+              Ne la poste pas publiquement « au hasard » ni à un tiers : seul ce registre
+              alimente l’extension. Envoyer la mauvaise personne ne lui donne pas ta privée,
+              mais ça ne fera pas fonctionner tes raids non plus — et un faux registre
+              pourrait induire en erreur.
+              <br /><br />
+              <strong>N’envoie jamais</strong> le fichier
+              <code>cli/keys/…_private.pem</code> : celui-là permettrait de forger des raids en ton nom.
+            </p>
+          </div>
           <pre class="code" id="pubBlock">${esc(block)}</pre>
           <div class="actions">
-            <button type="button" class="btn-kick" id="copyJson">Copier le JSON</button>
-            <a class="btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;"
-               href="https://t12lve.github.io/T2K/" target="_blank" rel="noopener">Ouvrir le tutoriel</a>
+            <a class="btn-kick" id="mailtoJson" style="text-decoration:none;display:inline-flex;align-items:center;"
+               href="#">Envoyer par e-mail au registre</a>
+            <button type="button" class="btn-ghost" id="copyJson">Copier le JSON</button>
+            <button type="button" class="btn-ghost" id="dlJson">Télécharger .json</button>
           </div>
-          <p class="hint">URL publique attendue : https://t12lve.github.io/T2K/streamers.json</p>
+          <p class="hint">
+            Le bouton e-mail ouvre ton client mail vers
+            <strong>2hellv@gmail.com</strong> avec le JSON déjà dans le message
+            (les pièces jointes mailto ne sont pas fiables : le contenu est dans le corps du mail).
+          </p>
           <div class="actions">
             <button type="button" class="btn-ghost" id="back">Retour</button>
-            <button type="button" class="btn-kick" id="next">C’est publié / plus tard</button>
+            <button type="button" class="btn-kick" id="next">J’ai envoyé / plus tard</button>
           </div>
           <div class="msg" id="msg"></div>`;
       }
@@ -550,6 +589,68 @@
         .replace(/"/g, '&quot;');
     }
 
+    function getPublicJsonText() {
+      if (state.publicKeyJson && /"x"\s*:/.test(state.publicKeyJson)) {
+        return state.publicKeyJson.trim();
+      }
+      const el = $('#pubBlock');
+      const raw = (el && el.textContent ? el.textContent.trim() : '') || '';
+      if (raw && /"x"\s*:/.test(raw) && raw.indexOf('…') === -1) return raw;
+      return '';
+    }
+
+    function buildMailtoHref() {
+      const jsonText = getPublicJsonText();
+      if (!jsonText) return '';
+      const streamer = state.cfg.streamer || 'streamer';
+      const subject = `[T2K] Ajout streamer ${streamer} — clé publique uniquement`;
+      const body =
+`Bonjour,
+
+Je souhaite être ajouté au registre officiel T2K (streamers.json / GitHub Pages).
+
+Login Twitch : ${streamer}
+Trigger : ${state.cfg.trigger || '!raid'}
+
+———
+POURQUOI CET ENVOI (à lire)
+
+• Ceci est UNIQUEMENT ma clé PUBLIQUE (JSON ci-dessous).
+• Ma clé PRIVÉE reste sur mon PC — je ne vous l’envoie PAS et ne dois la partager avec personne.
+• L’extension Chrome T2K ne fait confiance qu’au streamers.json maintenu par le registre.
+• Sans ajout de ma clé publique dans CE registre, mes raids signés ne fonctionneront pas pour les viewers.
+• Je partage ce JSON uniquement avec le mainteneur T2K (2hellv@gmail.com), pas avec des tiers.
+———
+
+JSON à fusionner dans public/streamers.json :
+
+${jsonText}
+
+Merci.
+`;
+      return (
+        'mailto:2hellv@gmail.com' +
+        '?subject=' + encodeURIComponent(subject) +
+        '&body=' + encodeURIComponent(body)
+      );
+    }
+
+    function downloadPublicJson() {
+      const jsonText = getPublicJsonText();
+      if (!jsonText) {
+        setMsg('Génère d’abord tes clés à l’étape précédente.', false);
+        return;
+      }
+      const streamer = state.cfg.streamer || 'streamer';
+      const blob = new Blob([jsonText + '\n'], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `t2k-${streamer}-public.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setMsg('Fichier JSON téléchargé — tu peux aussi le joindre manuellement au mail.', true);
+    }
+
     function bindOnboard(step) {
       const back = $('#back');
       const next = $('#next');
@@ -577,6 +678,22 @@
             setMsg('Copie manuelle nécessaire.', false);
           }
         };
+        const dl = $('#dlJson');
+        if (dl) dl.onclick = () => downloadPublicJson();
+        const mail = $('#mailtoJson');
+        if (mail) {
+          mail.onclick = (ev) => {
+            const href = buildMailtoHref();
+            if (!href) {
+              ev.preventDefault();
+              setMsg('Génère d’abord tes clés à l’étape précédente (JSON réel requis).', false);
+              return;
+            }
+            mail.setAttribute('href', href);
+          };
+          const href = buildMailtoHref();
+          if (href) mail.setAttribute('href', href);
+        }
       }
       if (step === 7) {
         const s = $('#sign');
