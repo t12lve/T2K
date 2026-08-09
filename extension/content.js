@@ -1,7 +1,7 @@
 'use strict';
 
 const T2K_STREAMERS_URL =
-  'https://example.gitlab.io/t2k/streamers.json'; /* REPLACE at deploy */
+  'https://t12lve.github.io/T2K/streamers.json';
 const T2K_RAID_RE = /!raid\s+([A-Za-z0-9_-]+={0,2})/;
 const T2K_TTL_SEC = 60;
 const T2K_DRIFT_SEC = 120;

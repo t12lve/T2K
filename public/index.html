@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>T2K — Tutoriel pas à pas (débutant)</title>
+  <meta name="description" content="Tutoriel simple pour utiliser T2K : raid Twitch vers Kick sécurisé, sans jargon." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #eef2f0;
+      --bg-2: #dde5e0;
+      --ink: #14201a;
+      --muted: #45534c;
+      --card: #fbfcfb;
+      --line: #c5d0c9;
+      --accent: #0b6e4f;
+      --accent-2: #0a4d6e;
+      --code-bg: #152019;
+      --code-fg: #e7f0ea;
+      --ok: #0b6e4f;
+      --warn: #7a5b00;
+      --radius: 12px;
+      --shadow: 0 12px 40px rgba(20, 32, 26, 0.08);
+      --max: 46rem;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #d5e6de 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #d3e0ea 0%, transparent 50%),
+        var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-2); }
+
+    .wrap {
+      width: min(100% - 2rem, var(--max));
+      margin-inline: auto;
+      padding: 2.5rem 0 4rem;
+    }
+
+    header {
+      padding: 2.25rem 0 1.5rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 2rem;
+    }
+
+    .brand {
+      font-family: Fraunces, Georgia, serif;
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      letter-spacing: -0.03em;
+      margin: 0 0 0.35rem;
+      line-height: 1.05;
+    }
+
+    .tagline {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 36rem;
+    }
+
+    nav.toc {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem 1.25rem;
+      margin: 1.75rem 0 2.5rem;
+    }
+
+    nav.toc strong { display: block; margin-bottom: 0.5rem; }
+    nav.toc ol { margin: 0; padding-left: 1.25rem; }
+    nav.toc li { margin: 0.25rem 0; }
+
+    h2 {
+      font-family: Fraunces, Georgia, serif;
+      font-size: 1.65rem;
+      margin: 2.5rem 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    p, li { color: var(--ink); }
+    .muted { color: var(--muted); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      margin: 1rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent);
+      padding: 0.85rem 1rem;
+      background: #e7f2ec;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 1rem 0;
+    }
+
+    .callout.warn {
+      border-left-color: var(--warn);
+      background: #f5efd9;
+    }
+
+    .step {
+      counter-increment: step;
+      position: relative;
+      padding-left: 3.1rem;
+      margin: 2rem 0;
+    }
+
+    .steps { counter-reset: step; }
+
+    .step::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .step h3 { margin-top: 0.15rem; }
+
+    pre, code {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.9rem;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 1rem 1.1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 0.75rem 0 0.25rem;
+    }
+
+    code.inline {
+      background: var(--bg-2);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+    }
+
+    .copy-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0 0 1rem;
+    }
+
+    .flow {
+      display: grid;
+      gap: 0.6rem;
+      margin: 1rem 0;
+    }
+
+    .flow .box {
+      background: var(--card);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .flow .arrow {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.6rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+      background: var(--card);
+    }
+
+    th { background: var(--bg-2); }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .roles {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 640px) {
+      .roles { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="muted" style="margin:0 0 0.5rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; font-size:0.78rem;">Tutoriel débutant</p>
+      <h1 class="brand">T2K</h1>
+      <p class="tagline">
+        Tu ne comprends rien à la crypto ? Pas grave. Ce guide t’explique
+        <strong>comme à un ami</strong> comment faire un raid Twitch → Kick
+        (ou autre site HTTPS) de façon sécurisée.
+      </p>
+    </header>
+
+    <nav class="toc" aria-label="Sommaire">
+      <strong>Sommaire</strong>
+      <ol>
+        <li><a href="#cest-quoi">C’est quoi T2K ?</a></li>
+        <li><a href="#roles">Deux rôles : streamer et viewer</a></li>
+        <li><a href="#besoin">Ce dont tu as besoin</a></li>
+        <li><a href="#pas-a-pas">Pas à pas (streamer)</a></li>
+        <li><a href="#viewer">Si tu es juste un viewer</a></li>
+        <li><a href="#bugs">Ça marche pas ?</a></li>
+        <li><a href="#fichiers">Où sont les fichiers</a></li>
+      </ol>
+    </nav>
+
+    <section id="cest-quoi">
+      <h2>C’est quoi T2K ?</h2>
+      <p>
+        Imagine que tu fais un live sur <strong>Twitch</strong> et que tu veux
+        envoyer ton chat vers une autre plateforme (souvent <strong>Kick</strong>).
+      </p>
+      <p>
+        Le problème : n’importe qui pourrait écrire dans le chat
+        <code class="inline">allez tous sur mon-site-chelou.com</code>.
+        Ce serait dangereux.
+      </p>
+      <p>
+        <strong>T2K</strong> règle ça avec une idée simple :
+      </p>
+      <div class="card">
+        Seul <em>toi</em> (le streamer) peux créer un message
+        <code class="inline">!raid …</code> <strong>authentique</strong>,
+        grâce à une « signature » secrète. L’extension des viewers vérifie
+        cette signature avant d’afficher un bouton de redirection.
+      </div>
+      <p class="muted">
+        Analogie : ta clé privée = le tampon de mairie. Ta clé publique =
+        le modèle que tout le monde peut utiliser pour vérifier que le tampon
+        est vrai. Personne ne peut fabriquer ton tampon.
+      </p>
+
+      <div class="flow" aria-hidden="true">
+        <div class="box">1. Tu signes un raid sur ton PC</div>
+        <div class="arrow">↓</div>
+        <div class="box">2. Tu colles !raid dans le chat Twitch</div>
+        <div class="arrow">↓</div>
+        <div class="box">3. L’extension vérifie → bannière 3 secondes</div>
+        <div class="arrow">↓</div>
+        <div class="box">4. Le viewer est redirigé (ou appuie sur Échap pour annuler)</div>
+      </div>
+    </section>
+
+    <section id="roles">
+      <h2>Deux rôles</h2>
+      <div class="roles">
+        <div class="card">
+          <h3 style="margin-top:0">Streamer (toi)</h3>
+          <p class="muted" style="margin:0">
+            Tu installes Node, tu génères tes clés, tu publies ta clé publique,
+            tu signes les raids, tu colles la commande dans ton chat.
+          </p>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Viewer (ton chat)</h3>
+          <p class="muted" style="margin:0">
+            Il installe juste l’extension Chrome T2K. Il n’a pas besoin de clés,
+            ni de Node, ni de ce tutoriel technique.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="besoin">
+      <h2>Ce dont tu as besoin (streamer)</h2>
+      <ul>
+        <li>Un PC (Windows, Mac ou Linux)</li>
+        <li>Le navigateur <strong>Google Chrome</strong> (ou Chromium / Edge compatible)</li>
+        <li><strong>Node.js</strong> — un logiciel gratuit pour lancer de petits scripts
+          (<a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> → bouton LTS)</li>
+        <li>Le projet T2K (dossier téléchargé depuis GitHub)</li>
+        <li>Environ 15–20 minutes la première fois</li>
+      </ul>
+      <div class="callout">
+        <strong>Astuce Windows :</strong> après avoir installé Node, ouvre
+        « Invite de commandes » ou « Terminal », tape
+        <code class="inline">node -v</code> puis Entrée.
+        Si tu vois un numéro (ex. <code class="inline">v22.x.x</code>), c’est bon.
+      </div>
+    </section>
+
+    <section id="pas-a-pas" class="steps">
+      <h2>Pas à pas (streamer)</h2>
+
+      <article class="step" id="etape-1">
+        <h3>Récupère le projet</h3>
+        <p>Sur GitHub, télécharge le ZIP du dépôt T2K, ou clone-le :</p>
+        <pre><code>git clone https://github.com/t12lve/T2K.git
+cd T2K</code></pre>
+        <p class="copy-hint">Tu dois être « dans » le dossier T2K pour la suite.</p>
+      </article>
+
+      <article class="step" id="etape-2">
+        <h3>Crée tes clés (une seule fois)</h3>
+        <p>
+          Remplace <code class="inline">monpseudo</code> par ton <strong>login Twitch
+          en minuscules</strong> (celui dans l’URL
+          <code class="inline">twitch.tv/monpseudo</code>).
+        </p>
+        <pre><code>node cli/generate-keys.js monpseudo</code></pre>
+        <p>Le script va :</p>
+        <ul>
+          <li>créer un fichier secret
+            <code class="inline">cli/keys/monpseudo_private.pem</code>
+            → <strong>ne le partage JAMAIS</strong>, ne l’envoie à personne ;</li>
+          <li>afficher un bloc JSON « publicKey » à copier.</li>
+        </ul>
+        <div class="callout warn">
+          <strong>Règle d’or :</strong> la clé privée = le code de ta carte bancaire.
+          Si quelqu’un l’a, il peut faire des faux raids en ton nom.
+        </div>
+      </article>
+
+      <article class="step" id="etape-3">
+        <h3>Ajoute ta clé publique dans streamers.json</h3>
+        <p>
+          Ouvre le fichier <code class="inline">public/streamers.json</code>
+          avec un éditeur de texte (Bloc-notes, VS Code…).
+        </p>
+        <p>Colle ton entrée. Exemple de forme :</p>
+        <pre><code>{
+  "streamers": {
+    "monpseudo": {
+      "displayName": "MonPseudo",
+      "publicKey": {
+        "kty": "EC",
+        "crv": "P-384",
+        "x": "…valeurs données par generate-keys…",
+        "y": "…valeurs données par generate-keys…"
+      }
+    }
+  }
+}</code></pre>
+        <p class="muted">
+          Le login (<code class="inline">monpseudo</code>) doit être
+          <strong>exactement</strong> en minuscules, comme dans l’URL Twitch.
+        </p>
+      </article>
+
+      <article class="step" id="etape-4">
+        <h3>Publie streamers.json (déjà prévu sur GitHub Pages)</h3>
+        <p>
+          Ce site (la page que tu lis) est servi avec le dossier
+          <code class="inline">public/</code>. Une fois ton
+          <code class="inline">streamers.json</code> mis à jour et poussé sur
+          GitHub (<code class="inline">main</code>), il sera disponible ici :
+        </p>
+        <pre><code>https://t12lve.github.io/T2K/streamers.json</code></pre>
+        <p>
+          Dans l’extension, l’adresse à configurer dans
+          <code class="inline">extension/content.js</code> doit être :
+        </p>
+        <pre><code>const T2K_STREAMERS_URL =
+  'https://t12lve.github.io/T2K/streamers.json';</code></pre>
+        <div class="callout">
+          Après modification de <code class="inline">content.js</code>, retourne sur
+          <code class="inline">chrome://extensions</code> et clique sur
+          <strong>Actualiser</strong> (icône circulaire) sur T2K.
+        </div>
+      </article>
+
+      <article class="step" id="etape-5">
+        <h3>Installe l’extension Chrome</h3>
+        <ol>
+          <li>Ouvre un nouvel onglet et tape : <code class="inline">chrome://extensions</code></li>
+          <li>Active le <strong>Mode développeur</strong> (en haut à droite)</li>
+          <li>Clique <strong>Charger l’extension non empaquetée</strong></li>
+          <li>Choisis le dossier <code class="inline">extension</code> du projet T2K
+            (celui qui contient <code class="inline">manifest.json</code>)</li>
+        </ol>
+        <p>Tu dois voir apparaître l’extension nommée <strong>T2K</strong>.</p>
+      </article>
+
+      <article class="step" id="etape-6">
+        <h3>Signe un raid et colle-le dans le chat</h3>
+        <p>Quand tu es prêt à raid :</p>
+        <pre><code>node cli/sign-raid.js monpseudo "https://kick.com/lacible" --ttl 60</code></pre>
+        <ul>
+          <li>L’URL doit commencer par <code class="inline">https://</code></li>
+          <li><code class="inline">--ttl 60</code> = le token reste utilisable ~1 minute
+            (max autorisé : 180 secondes)</li>
+        </ul>
+        <p>Le terminal affiche une seule ligne du genre :</p>
+        <pre><code>!raid eyJpIjoiLi4uIn0...</code></pre>
+        <ol>
+          <li>Copie toute la ligne</li>
+          <li>Va sur <strong>ta</strong> chaîne Twitch</li>
+          <li>Colle-la dans le chat et envoie</li>
+        </ol>
+        <p>
+          Les viewers qui ont T2K voient une bannière en bas :
+          « Raid T2K dans 3… ». S’ils ne font rien → redirection.
+          S’ils appuient sur <strong>Échap</strong> ou <strong>Annuler</strong> → rien ne se passe.
+        </p>
+      </article>
+    </section>
+
+    <section id="viewer">
+      <h2>Si tu es juste un viewer</h2>
+      <div class="card">
+        <ol>
+          <li>Demande au streamer le dossier <code class="inline">extension</code>
+            (ou le lien du dépôt GitHub)</li>
+          <li>Chrome → <code class="inline">chrome://extensions</code> → Mode développeur</li>
+          <li>Charger l’extension non empaquetée → dossier <code class="inline">extension</code></li>
+          <li>Regarde le live. Quand un vrai <code class="inline">!raid</code> arrive,
+            une bannière apparaît. Tu as 3 secondes pour annuler.</li>
+        </ol>
+        <p class="muted" style="margin-bottom:0">
+          Tu n’as pas besoin de générer de clés. Si la bannière n’apparaît jamais,
+          le streamer n’a peut‑être pas encore publié sa clé publique, ou
+          l’URL dans l’extension est encore le placeholder.
+        </p>
+      </div>
+    </section>
+
+    <section id="bugs">
+      <h2>Ça marche pas ?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Symptôme</th>
+            <th>Cause fréquente</th>
+            <th>Que faire</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Rien ne se passe après !raid</td>
+            <td>Mauvaise URL JSON, ou login ≠ URL Twitch</td>
+            <td>Vérifie <code class="inline">T2K_STREAMERS_URL</code>, recharge l’extension, login en minuscules</td>
+          </tr>
+          <tr>
+            <td>« Missing private key »</td>
+            <td>Tu n’as pas lancé generate-keys, ou mauvais login</td>
+            <td>Relance generate-keys avec le bon pseudo</td>
+          </tr>
+          <tr>
+            <td>Token rejeté / rien</td>
+            <td>Trop lent : le token a expiré</td>
+            <td>Resigne un raid et colle-le tout de suite</td>
+          </tr>
+          <tr>
+            <td>Erreur --ttl too large</td>
+            <td>TTL &gt; 180</td>
+            <td>Utilise 60 (recommandé) ou max 180</td>
+          </tr>
+          <tr>
+            <td>Redirect vers un mauvais site</td>
+            <td>—</td>
+            <td>Impossible si la vérif marche : l’URL est dans le message signé. Si doute, annule (Échap) et désinstalle l’extension</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="fichiers">
+      <h2>Où sont les fichiers (carte mentale)</h2>
+      <pre><code>T2K/
+├── cli/                  ← outils sur TON PC
+│   ├── generate-keys.js
+│   ├── sign-raid.js
+│   └── keys/             ← SECRETS (jamais sur GitHub)
+├── extension/            ← à charger dans Chrome
+│   ├── manifest.json
+│   └── content.js
+└── public/               ← site GitHub Pages (cette page + streamers.json)
+    ├── index.html        ← ce tutoriel
+    └── streamers.json    ← clés publiques</code></pre>
+      <p>
+        Doc technique plus détaillée :
+        <a href="https://github.com/t12lve/T2K">dépôt GitHub</a>
+        (fichier README).
+      </p>
+    </section>
+
+    <footer>
+      <p>
+        T2K — Twitch To Kick · tutoriel débutant ·
+        <a href="./streamers.json">streamers.json</a>
+      </p>
+      <p class="muted">
+        Aucun tracker. Aucune pub. L’extension ne fait confiance qu’à la
+        cryptographie, pas au « look » du chat.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,120 +1,151 @@
 # T2K (Twitch To Kick)
 
-Système de raid cross-platform sécurisé : un streamer signe localement une
-commande `!raid` (ECDSA P-384) ; une extension Chrome lue le chat Twitch,
-vérifie la signature avec la clé publique du streamer hébergée sur GitLab
-Pages, applique un anti-replay / anti-spam / isolation multi-streamer, puis
-affiche une bannière de confirmation avant de rediriger le viewer en HTTPS.
+Raid cross-platform signé : le streamer génère localement `!raid <token>` ;
+l’extension Chrome des viewers vérifie la signature (ECDSA P-384) et propose
+une redirection HTTPS après une bannière de 3 secondes.
 
-## Architecture
+## Tutoriel débutant (recommandé)
+
+Guide pas à pas sans jargon, hébergé sur GitHub Pages :
+
+**https://t12lve.github.io/T2K/**
+
+## Comment ça marche
+
+1. **Clés** — chaque streamer a une paire ECDSA P-384. La **privée** reste sur
+   son PC (`cli/keys/`). La **publique** (JWK) est publiée dans
+   `public/streamers.json`.
+2. **Signature** — le CLI crée un payload `{ url, exp, streamer }`, le signe,
+   et affiche `!raid <token>` à coller dans le chat Twitch.
+3. **Lecture chat** — l’extension observe le DOM Twitch (MutationObserver),
+   détecte `!raid …` par regex (pas de confiance aveugle au CSS).
+4. **Vérifications** (toutes obligatoires) :
+   - le login de la page = `streamer` du payload ;
+   - signature valide avec **sa** clé publique ;
+   - horodatage dans la fenêtre anti-replay ;
+   - signature pas déjà vue (anti-spam) ;
+   - URL cible en `https:` uniquement.
+5. **UI** — bannière 3 s (« Raid T2K dans… ») ; Escape / Annuler = stop ;
+   sinon redirection vers l’URL signée.
 
 ```
-cli/ (local)  --signe-->  chat Twitch  --observe-->  extension/content.js
-     |                              ^                         |
-     | JWK publique                |                         v
-     +----------> public/streamers.json <--- fetch --- GitLab Pages
-     |
-     +--> cli/keys/*_private.pem  (JAMAIS commité)
+PC streamer (CLI)  --colle !raid-->  chat Twitch
+        |                                  |
+   clé privée                         extension viewers
+        |                                  |
+   streamers.json  <--- fetch HTTPS ---+
+   (Pages / hébergeur statique)
 ```
 
-## Déploiement
+## Pas à pas (premier lancement)
 
-### 1. Publier `streamers.json` via GitLab Pages
+### A. Prérequis
 
-`public/streamers.json` est déployé par le job `pages` de
-`.gitlab-ci.yml` (artifact `public/`, déclenché sur la branche par défaut).
-Une fois le pipeline passé, l'URL publique ressemble à :
+- Node.js récent (15.9+ recommandé)
+- Chrome
+- Compte GitHub (ou autre hébergeur statique pour le JSON)
 
+### B. Clés + registre
+
+```bash
+# 1. Générer les clés (login Twitch en minuscules)
+node cli/generate-keys.js monpseudo
+
+# 2. Copier le bloc JWK affiché dans public/streamers.json :
+# {
+#   "streamers": {
+#     "monpseudo": {
+#       "displayName": "MonPseudo",
+#       "publicKey": { "kty": "EC", "crv": "P-384", "x": "...", "y": "..." }
+#     }
+#   }
+# }
 ```
-https://<namespace>.gitlab.io/<project>/streamers.json
-```
 
-**CORS** : GitLab Pages sert les réponses avec `Access-Control-Allow-Origin: *`
-par défaut, ce qui autorise les requêtes `fetch` faites depuis
-`https://www.twitch.tv`. Si `streamers.json` est hébergé ailleurs, l'origine
-qui sert le fichier **doit** répondre avec un en-tête CORS autorisant
-l'origine `https://www.twitch.tv` (ou `*`), sinon `t2kFetchStreamers()`
-échouera silencieusement et aucun raid ne sera possible.
+La clé privée est dans `cli/keys/monpseudo_private.pem` — **jamais** commitée
+(`.gitignore`).
 
-### 2. Configurer l'extension
+### C. Publier `streamers.json`
 
-`extension/content.js` contient un placeholder explicite à remplacer avant
-tout déploiement réel :
+Héberge le dossier `public/` (ou au moins `streamers.json`) en HTTPS, avec
+CORS autorisant `https://www.twitch.tv` (ou `*`).
+
+Exemples :
+
+- **GitHub Pages** (ce dépôt) : le dossier `public/` est déployé
+  automatiquement. URLs :
+  - Tutoriel : `https://t12lve.github.io/T2K/`
+  - JSON : `https://t12lve.github.io/T2K/streamers.json`
+- Autre hébergeur statique (Netlify, Cloudflare Pages, etc.) : même principe
+
+### D. Configurer l’extension (local, avant chargement)
+
+Dans `extension/content.js`, l’URL par défaut pointe déjà vers Pages :
 
 ```js
 const T2K_STREAMERS_URL =
-  'https://example.gitlab.io/t2k/streamers.json'; /* REPLACE at deploy */
+  'https://t12lve.github.io/T2K/streamers.json';
 ```
 
-Remplacez cette valeur par l'URL réelle de votre `streamers.json` publié à
-l'étape précédente, **puis** mettez à jour `host_permissions` dans
-`extension/manifest.json` pour qu'il corresponde exactement à l'origine de
-cette URL (le manifest contient déjà `https://*.gitlab.io/*` par défaut ; si
-vous hébergez ailleurs, ajoutez/adaptez l'entrée en conséquence).
+Si tu forks le projet, remplace cette URL par la tienne, et adapte
+`host_permissions` dans `extension/manifest.json` (`https://*.github.io/*`
+couvre déjà GitHub Pages).
 
-Ne jamais committer une URL réelle de production à la place du placeholder
-dans ce dépôt public — chaque déploiement doit faire ce remplacement
-localement (ou via un pipeline de build dédié).
+### E. Charger l’extension
 
-### 3. Charger l'extension dans Chrome
+1. Ouvre `chrome://extensions`
+2. Active le **mode développeur**
+3. **Charger l’extension non empaquetée** → dossier `extension/`
 
-1. `chrome://extensions` → activer le mode développeur.
-2. « Charger l'extension non empaquetée » → sélectionner le dossier
-   `extension/`.
+### F. Lancer un raid
 
-## CLI
+```bash
+# Sur le PC qui a la clé privée
+node cli/sign-raid.js monpseudo "https://kick.com/cible" --ttl 60
+```
 
-### Générer une paire de clés pour un streamer
+1. Copie la ligne `!raid …` affichée
+2. Sur `https://www.twitch.tv/monpseudo`, colle-la dans le chat
+3. Les viewers avec T2K voient la bannière → redirect (ou Escape pour annuler)
+
+`--ttl` max **180** secondes (sinon le token est immédiatement hors fenêtre
+côté extension).
+
+## Checklist de vérif rapide
+
+| Test | Attendu |
+|------|---------|
+| Token valide, bonne chaîne | Bannière 3 s → redirect |
+| Escape / Annuler | Pas de redirect |
+| Même signature rejouée / enveloppe mutée | Ignoré |
+| Mauvaise chaîne Twitch | Ignoré |
+| Token expiré | Ignoré |
+| URL `http://` | Rejeté par le CLI |
+| JSON injoignable (CORS / offline) | Silence, pas de crash |
+
+## CLI (référence)
 
 ```bash
 node cli/generate-keys.js <streamer_login>
-```
-
-- Génère une paire ECDSA P-384.
-- Écrit la clé privée dans `cli/keys/<login>_private.pem` (jamais commitée,
-  voir `.gitignore`).
-- Affiche le fragment `publicKey` (JWK) à coller dans
-  `public/streamers.json` sous `streamers.<login>`.
-- **Refuse d'écraser une clé privée existante** : si
-  `cli/keys/<login>_private.pem` existe déjà, la commande échoue avec un
-  message d'erreur (code de sortie 1) plutôt que de régénérer silencieusement
-  une nouvelle clé qui invaliderait la `publicKey` déjà publiée.
-
-### Signer un raid
-
-```bash
 node cli/sign-raid.js <streamer_login> <https_url> [--ttl 60]
 ```
 
-- Valide que l'URL cible est bien en `https:`.
-- Charge la clé privée locale `cli/keys/<login>_private.pem`.
-- Imprime une ligne prête à coller dans le chat Twitch : `!raid <token>`.
-- Aucun appel réseau.
-- `--ttl` (secondes, défaut `60`) est plafonné à **180s** : l'extension
-  applique une fenêtre anti-replay `[exp - (60 + 120), exp + 120]`, donc tout
-  `ttl` supérieur à 180s produirait un raid immédiatement rejeté (expiration
-  hors fenêtre) dès son affichage dans le chat. La commande échoue avec un
-  message clair si `--ttl` dépasse cette limite.
+- `generate-keys` **refuse** d’écraser une clé privée déjà présente
+- `sign-raid` ne fait **aucun** appel réseau
 
-## Ne jamais committer les clés privées
+## Sécurité clés
 
-`.gitignore` exclut déjà `cli/keys/`, `*.pem` et tout fichier `*private*`.
-Ne forcez jamais l'ajout (`git add -f`) d'une clé privée, et vérifiez
-`git status --ignored` avant de committer si vous avez un doute.
+- Ne jamais `git add -f` un `*.pem` / `cli/keys/`
+- En cas de doute : `git status --ignored`
+- L’entrée `demostreamer` dans `streamers.json` est **démo locale** uniquement :
+  remplace-la avant un déploiement réel
 
-## `demostreamer`
+## Docs design
 
-`public/streamers.json` contient une entrée `demostreamer` dont la clé
-privée correspondante (`cli/keys/demostreamer_private.pem`) existe
-uniquement en local pour les tests/démos (vérification crypto de bout en
-bout, `node cli/sign-raid.js demostreamer ...`). C'est une entrée **de démo
-uniquement** : remplacez-la (ou ajoutez vos streamers réels à côté) avant tout
-déploiement en production, et ne publiez jamais la clé privée `demostreamer`
-en dehors de cet environnement local.
+- Spec : [`docs/superpowers/specs/2026-08-09-t2k-raid-design.md`](docs/superpowers/specs/2026-08-09-t2k-raid-design.md)
+- Plan : [`docs/superpowers/plans/2026-08-09-t2k-raid-implementation.md`](docs/superpowers/plans/2026-08-09-t2k-raid-implementation.md)
 
 ## Hors scope v1
 
-Page options Chrome, allowlist de domaines Kick, tests automatisés,
-packaging Chrome Web Store, service worker/messaging, vérification que
-l'auteur du message chat est bien le broadcaster (la vérification
-cryptographique de la signature suffit).
+Page options Chrome, allowlist Kick, tests auto, Chrome Web Store,
+service worker, vérif que l’auteur chat = broadcaster (la crypto suffit).
