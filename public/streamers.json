@@ -1,12 +1,12 @@
 {
   "streamers": {
-    "example": {
-      "displayName": "ExampleStreamer",
+    "demostreamer": {
+      "displayName": "demostreamer",
       "publicKey": {
         "kty": "EC",
         "crv": "P-384",
-        "x": "REPLACE_AFTER_generate-keys",
-        "y": "REPLACE_AFTER_generate-keys"
+        "x": "ey0LmFoarYn09lhUEkcyqOzZxWSls_duRdDqVrYKheNqi3-Uv2WErWFOXxtkAC5a",
+        "y": "a6Bdcks8fdF5NwDpiymDesY_aF95xLxJ3HfHBfYfZaz_veI-gOhMetHSHiidUtRD"
       }
     }
   }
