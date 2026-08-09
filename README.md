@@ -1,31 +1,27 @@
 # T2K (Twitch To Kick)
 
-Raid simple : le **streamer** copie une phrase depuis l’extension et la colle
-dans son chat Twitch en live. Les **viewers** avec T2K sont redirigés vers
-`https://kick.com/<même_pseudo>`.
+Le streamer copie une **phrase discrète** depuis l’extension et la colle dans
+son chat Twitch en live. Les viewers avec T2K partent vers Kick.
 
 Tutoriel : https://t12lve.github.io/T2K/
 
-## Comment ça marche
+## Réglages (dans l’extension)
 
-1. Streamer en **live** sur **sa** chaîne Twitch  
-2. Clic icône T2K → **Copier** une phrase aléatoire  
-3. Coller **exactement** cette phrase dans le chat (rien d’autre sur la ligne)  
-4. Viewers : bannière 3 s → Kick (Escape = annuler)
+| Champ | Rôle |
+|--------|------|
+| **Source** | Login Twitch (chaîne en live) |
+| **Cible** | Login Kick (redirect) |
+| **Timer** | Secondes avant redirect (bannière) |
 
-**Sécurité** : seul le compte streamer (pseudo / badge) déclenche le raid.  
-Pas de clés, pas de registre, pas de token.
+Modifiables à tout moment via l’onglet **Réglages** du popup.
 
-## Installation
+**Viewers** : mêmes Source + Cible que le streamer (sinon pas de redirect vers la bonne chaîne).
 
-1. `chrome://extensions` → Mode développeur  
-2. **Charger l’extension non empaquetée** → dossier `extension/`  
-3. Viewers et streamer installent la même extension
+## Flux
 
-## Structure
+1. Installer `extension/` (mode développeur)  
+2. Ouvrir T2K → onboarding Source → Cible → Timer  
+3. En live : **Copier** une phrase → coller telle quelle dans le chat  
+4. Viewers : bannière → `kick.com/<cible>` (Escape = annuler)
 
-```
-extension/     ← Chrome MV3 (phrases + popup + content script)
-public/        ← tutoriel GitHub Pages
-logo.png
-```
+Sécurité : seul le **streamer** (pseudo / badge) sur la **source**, en **live**.

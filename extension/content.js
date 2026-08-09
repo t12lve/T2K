@@ -1,12 +1,15 @@
 'use strict';
 
 /**
- * T2K v3 — phrase trigger only.
- * Broadcaster + live + own channel → https://kick.com/<login>
+ * T2K — phrase dog-whistle + settings (source → cible, timer).
  */
 
-const T2K_BANNER_SEC = 3;
-
+let t2kSettings = {
+  source: '',
+  target: '',
+  timerSec: 3,
+  onboardingDone: false,
+};
 let t2kBannerTimer = null;
 let t2kCountdownTimer = null;
 
@@ -151,9 +154,10 @@ function t2kOnEscape(ev) {
   }
 }
 
-function t2kShowBanner(url) {
+function t2kShowBanner(url, seconds) {
   if (document.getElementById('t2k-raid-banner')) return;
 
+  const sec = Math.min(30, Math.max(1, Number(seconds) || 3));
   const root = document.createElement('div');
   root.id = 't2k-raid-banner';
   root.setAttribute('role', 'dialog');
@@ -184,7 +188,7 @@ function t2kShowBanner(url) {
   document.documentElement.appendChild(root);
   document.addEventListener('keydown', t2kOnEscape, true);
 
-  let left = T2K_BANNER_SEC;
+  let left = sec;
   const paint = () => {
     msg.textContent = `Raid T2K dans ${left}… `;
   };
@@ -202,14 +206,18 @@ function t2kShowBanner(url) {
   t2kBannerTimer = setTimeout(() => {
     t2kRemoveBanner();
     window.location.assign(url);
-  }, T2K_BANNER_SEC * 1000);
+  }, sec * 1000);
 }
 
 function t2kHandleChatLine(line) {
   if (!line || line.nodeType !== 1) return;
+  if (!t2kSettings.source) {
+    t2kDebug('no source configured');
+    return;
+  }
 
   const login = t2kChannelLogin();
-  if (!login) return;
+  if (login !== t2kSettings.source) return;
 
   const text = t2kExtractMessageText(line);
   if (typeof t2kIsTriggerPhrase !== 'function' || !t2kIsTriggerPhrase(text)) {
@@ -233,9 +241,10 @@ function t2kHandleChatLine(line) {
   if (t2kAlreadySeen(seen)) return;
   t2kMarkSeen(seen);
 
-  const url = `https://kick.com/${login}`;
+  const target = t2kSettings.target || t2kSettings.source;
+  const url = `https://kick.com/${target}`;
   t2kDebug('raid →', url);
-  t2kShowBanner(url);
+  t2kShowBanner(url, t2kSettings.timerSec);
 }
 
 function t2kScanNode(node) {
@@ -265,4 +274,16 @@ function t2kObserveChat() {
   obs.observe(root, { childList: true, subtree: true });
 }
 
-t2kObserveChat();
+async function t2kRefreshSettings() {
+  t2kSettings = await t2kLoadSettings();
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'sync') return;
+  t2kRefreshSettings();
+});
+
+(async function t2kMain() {
+  await t2kRefreshSettings();
+  t2kObserveChat();
+})();

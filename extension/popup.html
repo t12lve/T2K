@@ -12,72 +12,155 @@
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; width: 320px; font-family: "DM Sans", system-ui, sans-serif;
+      margin: 0; width: 340px; font-family: "DM Sans", system-ui, sans-serif;
       color: var(--ink); background: var(--bg);
     }
-    .pad { padding: 0.9rem 1rem 1.1rem; }
-    .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
-    .brand img { width: 52px; border-radius: 6px; }
-    h1 { font-family: Syne, sans-serif; font-size: 1.15rem; margin: 0; }
-    .sub { margin: 0.1rem 0 0; font-size: 0.78rem; color: var(--muted); }
+    .pad { padding: 0.85rem 0.95rem 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
+    .brand img { width: 48px; border-radius: 6px; }
+    h1 { font-family: Syne, sans-serif; font-size: 1.1rem; margin: 0; }
+    .sub { margin: 0.1rem 0 0; font-size: 0.75rem; color: var(--muted); }
     .card {
       background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
-      padding: 0.75rem 0.8rem; margin-bottom: 0.65rem;
+      padding: 0.7rem 0.75rem; margin-bottom: 0.55rem;
     }
     .tw { border-color: rgba(145,70,255,.4); }
     .ki { border-color: rgba(83,252,24,.35); }
-    h2 { font-size: 0.82rem; margin: 0 0 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-    p, li { font-size: 0.82rem; color: var(--muted); line-height: 1.45; margin: 0.25rem 0; }
-    ul { margin: 0.2rem 0 0; padding-left: 1rem; }
-    .phrase {
-      margin: 0.35rem 0 0.55rem; padding: 0.65rem 0.7rem; background: #0c0c0e;
-      border-radius: 8px; font-size: 0.9rem; color: var(--ink); line-height: 1.4;
-      border-left: 3px solid var(--twitch); min-height: 2.8rem;
+    h2 {
+      font-size: 0.72rem; margin: 0 0 0.4rem; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--muted);
     }
-    .actions { display: flex; gap: 0.4rem; }
+    p, li { font-size: 0.8rem; color: var(--muted); line-height: 1.4; margin: 0.2rem 0; }
+    ul { margin: 0.15rem 0 0; padding-left: 1rem; }
+    label {
+      display: block; font-size: 0.72rem; font-weight: 600; color: var(--ink);
+      margin: 0.45rem 0 0.2rem;
+    }
+    input {
+      width: 100%; padding: 0.45rem 0.55rem; border-radius: 7px;
+      border: 1px solid var(--line); background: #0c0c0e; color: var(--ink); font: inherit; font-size: 0.82rem;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+    .flow {
+      display: flex; align-items: center; gap: 0.35rem; margin-top: 0.35rem;
+      font-size: 0.75rem; color: var(--muted);
+    }
+    .flow strong.twitch { color: var(--twitch); }
+    .flow strong.kick { color: var(--kick); }
+    .phrase {
+      margin: 0.3rem 0 0.5rem; padding: 0.55rem 0.6rem; background: #0c0c0e;
+      border-radius: 8px; font-size: 0.86rem; color: var(--ink); line-height: 1.35;
+      border-left: 3px solid var(--twitch); min-height: 2.5rem;
+    }
+    .actions { display: flex; gap: 0.35rem; }
     button {
-      flex: 1; border: 0; border-radius: 8px; padding: 0.55rem 0.5rem;
-      font: inherit; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+      flex: 1; border: 0; border-radius: 8px; padding: 0.5rem 0.4rem;
+      font: inherit; font-weight: 700; font-size: 0.78rem; cursor: pointer;
     }
     .btn-copy { background: var(--kick); color: #0a0a0a; }
     .btn-new { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-    .msg { font-size: 0.78rem; margin-top: 0.45rem; min-height: 1.1em; color: var(--kick); font-weight: 600; }
-    a { color: var(--kick); font-size: 0.78rem; }
+    .btn-tw { background: var(--twitch); color: #fff; }
+    .btn-gh { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+    .msg { font-size: 0.75rem; margin-top: 0.4rem; min-height: 1em; color: var(--kick); font-weight: 600; }
+    .msg.err { color: #ff5c7a; }
+    .hidden { display: none !important; }
+    .tabs { display: flex; gap: 0.3rem; margin-bottom: 0.55rem; }
+    .tabs button {
+      flex: 1; padding: 0.4rem; font-size: 0.72rem; background: #0c0c0e;
+      color: var(--muted); border: 1px solid var(--line);
+    }
+    .tabs button.on { color: var(--ink); border-color: var(--twitch); }
   </style>
 </head>
 <body>
   <div class="pad">
     <div class="brand">
-      <img src="logo.png" alt="T2K" width="52" height="28" />
+      <img src="icon.png" alt="T2K" width="48" height="48" />
       <div>
         <h1>T2K</h1>
-        <p class="sub"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span></p>
+        <p class="sub"><span style="color:var(--twitch)">Source</span> → <span style="color:var(--kick)">Cible</span></p>
       </div>
     </div>
 
-    <div class="card tw">
-      <h2>Comment ça marche</h2>
-      <ul>
-        <li>Tu es <strong style="color:var(--ink)">en live</strong> sur <strong style="color:var(--ink)">ta</strong> chaîne Twitch.</li>
-        <li>Tu colles <strong style="color:var(--ink)">une phrase</strong> (ci-dessous) dans le chat.</li>
-        <li>Les viewers avec T2K partent vers <strong style="color:var(--kick)">kick.com/tonpseudo</strong>.</li>
-        <li>Sécurité : seul le <strong style="color:var(--ink)">streamer</strong> peut déclencher.</li>
-      </ul>
-    </div>
-
-    <div class="card ki">
-      <h2>Ta phrase du moment</h2>
-      <div class="phrase" id="phrase">…</div>
-      <div class="actions">
-        <button type="button" class="btn-copy" id="copy">Copier</button>
-        <button type="button" class="btn-new" id="reroll">Autre phrase</button>
+    <!-- Onboarding (1st launch) -->
+    <div id="viewOnboard">
+      <div class="card tw">
+        <h2>Bienvenue</h2>
+        <ul>
+          <li><strong style="color:var(--ink)">Source</strong> = ta chaîne Twitch (live).</li>
+          <li><strong style="color:var(--ink)">Cible</strong> = ta chaîne Kick.</li>
+          <li>Tu colles une phrase discrète dans le chat → les viewers partent vers Kick.</li>
+          <li>Seul le <strong style="color:var(--ink)">streamer</strong> peut déclencher.</li>
+        </ul>
       </div>
-      <div class="msg" id="msg"></div>
+      <div class="card ki">
+        <h2>Configure</h2>
+        <label for="obSource">Chaîne source (Twitch)</label>
+        <input id="obSource" placeholder="tonpseudo" autocomplete="off" />
+        <label for="obTarget">Chaîne cible (Kick)</label>
+        <input id="obTarget" placeholder="même ou autre" autocomplete="off" />
+        <label for="obTimer">Timer bannière (secondes)</label>
+        <input id="obTimer" type="number" min="1" max="30" value="3" />
+        <div class="flow">
+          <strong class="twitch" id="obFlowTw">twitch.tv/…</strong>
+          <span>→</span>
+          <strong class="kick" id="obFlowKi">kick.com/…</strong>
+        </div>
+        <div class="actions" style="margin-top:0.65rem;">
+          <button type="button" class="btn-tw" id="obSave">Enregistrer &amp; continuer</button>
+        </div>
+        <div class="msg" id="obMsg"></div>
+      </div>
     </div>
 
-    <p style="margin:0;"><a href="https://t12lve.github.io/T2K/" target="_blank" rel="noopener">Tutoriel</a></p>
+    <!-- Main -->
+    <div id="viewMain" class="hidden">
+      <div class="tabs">
+        <button type="button" class="on" id="tabRaid" data-tab="raid">Raid</button>
+        <button type="button" id="tabSettings" data-tab="settings">Réglages</button>
+      </div>
+
+      <div id="panelRaid">
+        <div class="card tw">
+          <h2>Parcours</h2>
+          <div class="flow" style="margin:0;">
+            <strong class="twitch" id="flowTw">—</strong>
+            <span>→</span>
+            <strong class="kick" id="flowKi">—</strong>
+            <span id="flowTimer" style="margin-left:auto;"></span>
+          </div>
+        </div>
+        <div class="card ki">
+          <h2>Phrase (discrète)</h2>
+          <div class="phrase" id="phrase">…</div>
+          <div class="actions">
+            <button type="button" class="btn-copy" id="copy">Copier</button>
+            <button type="button" class="btn-new" id="reroll">Autre</button>
+          </div>
+          <div class="msg" id="msg"></div>
+        </div>
+      </div>
+
+      <div id="panelSettings" class="hidden">
+        <div class="card tw">
+          <h2>Source → Cible · Timer</h2>
+          <label for="source">Source Twitch</label>
+          <input id="source" autocomplete="off" />
+          <label for="target">Cible Kick</label>
+          <input id="target" autocomplete="off" />
+          <label for="timer">Timer (1–30 s)</label>
+          <input id="timer" type="number" min="1" max="30" />
+          <div class="actions" style="margin-top:0.6rem;">
+            <button type="button" class="btn-tw" id="save">Sauver</button>
+            <button type="button" class="btn-gh" id="redoOnboard">Revoir l’intro</button>
+          </div>
+          <div class="msg" id="setMsg"></div>
+        </div>
+      </div>
+    </div>
   </div>
   <script src="phrases.js"></script>
+  <script src="settings.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

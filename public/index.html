@@ -23,25 +23,18 @@
     }
     .wrap { width: min(100% - 2rem, var(--max)); margin: 0 auto; padding: 2rem 0 3rem; }
     .brand { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.25rem; }
-    .brand img { width: 88px; border-radius: 10px; }
+    .brand img { width: 72px; border-radius: 10px; }
     h1 { font-family: Syne, sans-serif; margin: 0; font-size: clamp(1.8rem, 5vw, 2.3rem); }
-    .tag { color: var(--muted); margin: 0.2rem 0 0; font-size: 0.95rem; }
-    h2 { font-family: Syne, sans-serif; font-size: 1.3rem; margin: 1.75rem 0 0.55rem; }
+    .tag { color: var(--muted); margin: 0.2rem 0 0; }
+    h2 { font-family: Syne, sans-serif; font-size: 1.25rem; margin: 1.75rem 0 0.55rem; }
     .card {
       background: var(--card); border: 1px solid var(--line); border-radius: 12px;
       padding: 1rem 1.1rem; margin: 0.75rem 0;
     }
     .tw { border-color: rgba(145,70,255,.4); }
     .ki { border-color: rgba(83,252,24,.35); }
-    .pill {
-      display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; padding: 0.22rem 0.5rem; border-radius: 99px; margin-bottom: 0.45rem;
-    }
-    .pill-tw { background: rgba(145,70,255,.2); color: #c4a0ff; }
-    .pill-ki { background: rgba(83,252,24,.14); color: var(--kick); }
     p, li { color: var(--muted); }
     li strong { color: var(--ink); }
-    ol, ul { padding-left: 1.15rem; }
     a { color: var(--kick); }
     code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; }
     footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
@@ -50,63 +43,52 @@
 <body>
   <div class="wrap">
     <header class="brand">
-      <img src="https://raw.githubusercontent.com/t12lve/T2K/main/logo.png" alt="T2K" width="88" height="48" />
+      <img src="https://raw.githubusercontent.com/t12lve/T2K/main/icon.png" alt="T2K" width="72" height="72" />
       <div>
         <h1>T2K</h1>
-        <p class="tag"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span> · phrase simple</p>
+        <p class="tag"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span></p>
       </div>
     </header>
 
     <div class="card tw">
-      <span class="pill pill-tw">En une phrase</span>
       <p style="margin:0;">
-        Le streamer copie une phrase depuis l’extension et la colle dans le chat.
-        Les viewers avec T2K partent vers <strong style="color:var(--kick)">Kick</strong>
-        (<code>kick.com/sonpseudo</code>. Pas de clé, pas d’e-mail, pas de registre.
+        Une phrase anodine dans le chat du streamer → les viewers avec l’extension
+        partent sur Kick. Réglages dans le popup : <strong style="color:var(--ink)">Source</strong>,
+        <strong style="color:var(--ink)">Cible</strong>, <strong style="color:var(--ink)">Timer</strong>.
       </p>
     </div>
 
-    <h2>Sécurité</h2>
-    <div class="card tw">
+    <h2>Réglages</h2>
+    <div class="card ki">
       <ul>
-        <li>Seul le <strong>streamer</strong> (pseudo / badge) déclenche le raid.</li>
-        <li>Il doit être <strong>en live</strong> sur <strong>sa</strong> chaîne.</li>
-        <li>La phrase doit être <strong>exacte</strong> (celle proposée par l’extension).</li>
+        <li><strong>Source</strong> — login Twitch (chaîne live à écouter)</li>
+        <li><strong>Cible</strong> — login Kick (destination)</li>
+        <li><strong>Timer</strong> — secondes de la bannière avant redirect</li>
       </ul>
+      <p style="margin:0.5rem 0 0;">
+        Streamer et viewers doivent avoir la <strong style="color:var(--ink)">même</strong> Source / Cible.
+        Modifiable à tout moment (onglet Réglages).
+      </p>
     </div>
 
     <h2>Streamer</h2>
-    <div class="card ki">
-      <span class="pill pill-ki">Pendant le live</span>
+    <div class="card tw">
       <ol>
-        <li>Installe l’extension (dossier <code>extension/</code> en mode développeur).</li>
-        <li>Clique l’icône <strong>T2K</strong> dans Chrome.</li>
-        <li>Clique <strong>Copier</strong> (ou « Autre phrase »).</li>
-        <li>Colle dans ton chat Twitch — <strong>rien d’autre sur la ligne</strong>.</li>
+        <li>Installe l’extension → ouvre T2K → configure Source / Cible / Timer.</li>
+        <li>En live sur la Source : <strong style="color:var(--ink)">Copier</strong> une phrase → colle-la telle quelle.</li>
       </ol>
     </div>
 
     <h2>Viewer</h2>
-    <div class="card tw">
+    <div class="card ki">
       <ol>
-        <li>Installe la même extension.</li>
-        <li>Regarde le live Twitch.</li>
-        <li>Quand le streamer colle la phrase : bannière 3 s → Kick (Échap = annuler).</li>
+        <li>Même extension + mêmes réglages Source / Cible.</li>
+        <li>Regarde le live → bannière → Kick (Échap = annuler).</li>
       </ol>
     </div>
 
-    <h2>Si ça ne marche pas</h2>
-    <div class="card">
-      <ul>
-        <li>Pas en live / pas sur ta chaîne / ce n’est pas toi qui as posté</li>
-        <li>Phrase modifiée (un caractère en trop ou manquant)</li>
-        <li>Extension non chargée / à recharger après mise à jour</li>
-        <li>Pseudo Kick différent de Twitch → la cible sera quand même <code>kick.com/&lt;pseudo_twitch&gt;</code></li>
-      </ul>
-    </div>
-
     <footer>
-      <a href="https://github.com/t12lve/T2K">GitHub</a> · extension v3
+      <a href="https://github.com/t12lve/T2K">GitHub</a> · phrases discrètes · pas de registre
     </footer>
   </div>
 </body>

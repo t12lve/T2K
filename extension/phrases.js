@@ -1,27 +1,30 @@
 'use strict';
 
-/** Phrases trigger T2K — exact match (trim). Un peu marquées pour limiter les faux positifs. */
+/**
+ * Phrases « dog whistle » : passent pour des adieux / remerciements ordinaires.
+ * Match exact (trim) uniquement.
+ */
 const T2K_PHRASES = [
-  'On se retrouve de l’autre côté les amis',
-  'Allez, direction l’autre plateforme',
-  'Merci pour le live, on continue ailleurs',
-  'Bonne soirée, on se rejoint de l’autre côté',
-  'Je vous emmène avec moi, suivez le mouvement',
-  'C’est l’heure de changer de salle',
-  'On bascule, à tout de suite de l’autre côté',
-  'Merci à tous, rendez-vous sur l’autre chaîne',
-  'Le stream continue juste à côté',
-  'Allez hop, tout le monde de l’autre côté',
-  'Fin de session ici, on se retrouve ailleurs',
-  'Vous êtes les meilleurs, suivez-moi de l’autre côté',
-  'Petite migration express, on y va',
-  'Je ferme ici, on ouvre de l’autre côté',
-  'Merci pour votre énergie, direction la suite',
-  'On file, à tout de suite de l’autre côté',
-  'Dernier message ici, on continue ailleurs',
-  'Vous me suivez ? On change de plateforme',
-  'Go l’autre côté, on vous attend',
-  'Bisous et à tout de suite de l’autre côté',
+  'Allez, prenez soin de vous',
+  'Bonne fin de soirée à tous',
+  'Merci d’avoir passé ce moment',
+  'Je vous laisse tranquilles',
+  'À plus tard les amis',
+  'Faites de beaux rêves',
+  'Merci pour votre présence ce soir',
+  'On se dit à la prochaine',
+  'Je coupe ici, prenez soin de vous',
+  'Bonne continuation à tout le monde',
+  'Allez, je vous libère',
+  'Merci d’être restés jusqu’au bout',
+  'Je vais m’arrêter là pour ce soir',
+  'Passez une excellente soirée',
+  'Bisous et à très vite',
+  'Je vous souhaite une belle nuit',
+  'Merci encore, vraiment de vous',
+  'On se retrouve une prochaine fois',
+  'Allez, je range tout ça',
+  'Bonne soirée, et merci pour tout',
 ];
 
 function t2kPickRandomPhrase() {
