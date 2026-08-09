@@ -1,0 +1,11 @@
+{
+  "name": "t2k-pack",
+  "private": true,
+  "description": "Pack scripts only — not required to run the extension",
+  "scripts": {
+    "pack": "node scripts/pack-extension.js"
+  },
+  "devDependencies": {
+    "crx3": "^2.0.0"
+  }
+}

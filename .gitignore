@@ -13,8 +13,10 @@ Desktop.ini
 
 # Secrets / scratch
 *.pem
+keys/
 cli/
 .env
 .env.*
 logo.psd
 .superpowers/
+package-lock.json

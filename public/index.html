@@ -36,7 +36,20 @@
     p, li { color: var(--muted); }
     li strong { color: var(--ink); }
     a { color: var(--kick); }
-    code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; }
+    code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+    .dl {
+      display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 0.85rem;
+    }
+    .dl a {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.55rem 0.9rem; border-radius: 8px; font-weight: 700;
+      text-decoration: none; font-size: 0.9rem;
+    }
+    .dl .primary { background: var(--kick); color: #0a0a0a; }
+    .dl .secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    .note { font-size: 0.85rem; margin: 0.65rem 0 0; }
+    ol.steps { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+    ol.steps li { margin: 0.35rem 0; }
     footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
   </style>
 </head>
@@ -55,6 +68,37 @@
         Une phrase anodine dans le chat du streamer → les viewers avec l’extension
         partent sur Kick. Réglages dans le popup : <strong style="color:var(--ink)">Source</strong>,
         <strong style="color:var(--ink)">Cible</strong>, <strong style="color:var(--ink)">Timer</strong>.
+      </p>
+    </div>
+
+    <h2>Télécharger</h2>
+    <div class="card ki">
+      <p style="margin:0;">
+        Paquet prêt pour Chrome (v3.1.1) — ZIP = format Chrome Web Store.
+        CRX = même extension, signée localement (hors boutique Chrome bloque souvent l’install directe du CRX).
+      </p>
+      <div class="dl">
+        <a class="primary" href="T2K.zip" download>Télécharger T2K.zip</a>
+        <a class="secondary" href="T2K.crx" download>Télécharger T2K.crx</a>
+      </div>
+      <p class="note">
+        Recommandé : le <strong style="color:var(--ink)">ZIP</strong> + installation manuelle ci-dessous.
+      </p>
+    </div>
+
+    <h2>Installer dans Chrome / Edge</h2>
+    <div class="card tw">
+      <ol class="steps">
+        <li>Télécharge <strong style="color:var(--ink)">T2K.zip</strong> et décompresse-le (tu dois voir un dossier avec <code>manifest.json</code> dedans).</li>
+        <li>Ouvre <code>chrome://extensions</code> (ou <code>edge://extensions</code>).</li>
+        <li>Active le <strong style="color:var(--ink)">Mode développeur</strong> (en haut à droite).</li>
+        <li>Clique <strong style="color:var(--ink)">Charger l’extension non empaquetée</strong>.</li>
+        <li>Sélectionne le dossier décompressé (celui qui contient <code>manifest.json</code>).</li>
+        <li>L’icône T2K apparaît dans la barre — clique pour configurer Source / Cible / Timer.</li>
+      </ol>
+      <p class="note">
+        Après une mise à jour du ZIP : remplace les fichiers du dossier, puis clique
+        <strong style="color:var(--ink)">Actualiser</strong> sur la carte T2K dans <code>chrome://extensions</code>.
       </p>
     </div>
 
@@ -88,7 +132,9 @@
     </div>
 
     <footer>
-      <a href="https://github.com/t12lve/T2K">GitHub</a> · phrases discrètes · pas de registre
+      <a href="https://github.com/t12lve/T2K">GitHub</a> ·
+      <a href="T2K.zip">T2K.zip</a> ·
+      phrases discrètes · pas de registre
     </footer>
   </div>
 </body>
