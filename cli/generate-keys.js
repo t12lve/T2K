@@ -14,13 +14,23 @@ if (!login || !/^[a-z0-9_]{1,25}$/.test(login)) {
 const keysDir = path.join(__dirname, 'keys');
 fs.mkdirSync(keysDir, { recursive: true });
 
+const pemPath = path.join(keysDir, `${login}_private.pem`);
+if (fs.existsSync(pemPath)) {
+  console.error(
+    `Refusing to overwrite existing private key: ${pemPath}\n` +
+      'Remove it manually first if you really want to regenerate it ' +
+      '(this will invalidate the matching publicKey in streamers.json).'
+  );
+  process.exit(1);
+}
+
 const { privateKey, publicKey } = crypto.generateKeyPairSync('ec', {
   namedCurve: 'P-384',
 });
 
-const pemPath = path.join(keysDir, `${login}_private.pem`);
 fs.writeFileSync(pemPath, privateKey.export({ type: 'pkcs8', format: 'pem' }), {
   mode: 0o600,
+  flag: 'wx',
 });
 
 const jwk = publicKey.export({ format: 'jwk' });
