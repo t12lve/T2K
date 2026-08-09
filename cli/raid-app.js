@@ -173,9 +173,24 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(port, '127.0.0.1', () => {
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(
+      `Port ${port} déjà utilisé. Ferme l’autre fenêtre T2K, ou change "port" dans cli/t2k.config.json.`
+    );
+  } else {
+    console.error(err);
+  }
+  process.exit(1);
+});
+
+// Bind all local interfaces so http://127.0.0.1 and http://localhost both work.
+server.listen(port, () => {
   const url = `http://127.0.0.1:${port}/`;
-  console.log(`T2K wizard: ${url}`);
-  console.log(`TTL max: ${T2K_MAX_TTL_SEC}s — close this window to stop.`);
+  console.log('');
+  console.log('  T2K wizard prêt');
+  console.log(`  → ${url}`);
+  console.log('  Ne ferme PAS cette fenêtre tant que tu utilises l’assistant.');
+  console.log('');
   t2kOpenBrowser(url);
 });

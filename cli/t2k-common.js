@@ -80,9 +80,19 @@ function t2kSaveConfig(cfg) {
     port: Number(cfg.port) > 0 ? Number(cfg.port) : 3847,
     onboardingComplete: Boolean(cfg.onboardingComplete),
   };
-  fs.writeFileSync(T2K_CONFIG_PATH, JSON.stringify(next, null, 2) + '\n', {
-    mode: 0o600,
-  });
+  const json = JSON.stringify(next, null, 2) + '\n';
+  const tmp = T2K_CONFIG_PATH + '.tmp';
+  fs.writeFileSync(tmp, json, { mode: 0o600 });
+  try {
+    fs.renameSync(tmp, T2K_CONFIG_PATH);
+  } catch {
+    fs.writeFileSync(T2K_CONFIG_PATH, json, { mode: 0o600 });
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      /* ignore */
+    }
+  }
   return next;
 }
 

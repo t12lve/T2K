@@ -1,9 +1,15 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title T2K — Assistant Twitch to Kick
+title T2K — Assistant (ne pas fermer)
 echo.
-echo   T2K — lancement de l'assistant (wizard)...
+echo   ========================================
+echo    T2K — Assistant Twitch vers Kick
+echo   ========================================
+echo.
+echo   IMPORTANT : laisse cette fenetre OUVERTE
+echo   pendant que tu utilises le guide dans
+echo   le navigateur. La fermer = "Failed to fetch".
 echo.
 where node >nul 2>&1
 if errorlevel 1 (
@@ -14,4 +20,6 @@ if errorlevel 1 (
   exit /b 1
 )
 node "%~dp0cli\raid-app.js"
-if errorlevel 1 pause
+echo.
+echo   Assistant arrete.
+pause

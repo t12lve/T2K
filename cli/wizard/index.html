@@ -283,10 +283,21 @@
     }
 
     async function api(path, opts) {
-      const res = await fetch(path, {
-        headers: { 'Content-Type': 'application/json' },
-        ...opts,
-      });
+      let res;
+      try {
+        res = await fetch(path, {
+          headers: { 'Content-Type': 'application/json' },
+          ...opts,
+        });
+      } catch (e) {
+        const lost =
+          'Assistant déconnecté. Relance T2K-Raid.bat et ne ferme pas la fenêtre noire (serveur local).';
+        throw new Error(
+          e && /failed to fetch|networkerror|load failed/i.test(String(e.message || e))
+            ? lost
+            : lost + ' (' + (e.message || e) + ')'
+        );
+      }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Erreur serveur');
       return data;
