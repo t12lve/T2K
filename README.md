@@ -104,15 +104,15 @@ couvre déjà GitHub Pages).
 
 ### F. Lancer un raid (assistant local — recommandé)
 
-1. Double-clic sur **`T2K-Raid.bat`** (ou `npm start`)
-2. Au **premier lancement**, un **wizard d’onboarding** explique tout
-   (rôles, login Twitch, trigger, clés, JSON, extension, premier raid).
-   Design : violet Twitch / vert Kick + logo `logo.png`.
-3. Ensuite : écran **Raid** → URL Kick → **Signer & copier** → colle sur Twitch
+1. Double-clic sur **`T2K-Assistant.vbs`** (recommandé : **pas de fenêtre noire**)
+   - Alternative debug : `T2K-Raid.bat` (console visible)
+   - Ou `npm start`
+2. Au **premier lancement**, un **wizard** explique tout (TTL, collage, registre…).
+3. Écran **Raid** → URL Kick → **Signer & copier** → colle **une seule ligne** sur Twitch
 4. Bouton **Guide** pour rejouer l’onboarding
 
-Le trigger choisi doit être **identique** au champ `"trigger"` de ton entrée
-dans `public/streamers.json` (sinon les viewers ne détectent rien).
+**TTL** = durée de vie du token (défaut **60 s**, max **180**).  
+**F5** sur Twitch peut rejouer le raid tant que le token n’est pas expiré.
 
 En ligne de commande (équivalent) :
 

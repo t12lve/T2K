@@ -510,14 +510,46 @@
 
       if (step === 7) {
         return head + `
-          <h2>Premier raid</h2>
-          <p class="lead">Choisis l’URL <strong style="color:var(--kick)">Kick</strong> (https), on signe, tu colles sur <strong style="color:var(--twitch)">Twitch</strong>.</p>
+          <h2>Premier raid — règles importantes</h2>
+          <p class="lead">Choisis l’URL <strong style="color:var(--kick)">Kick</strong> (https), on signe, tu colles <strong>une seule ligne</strong> sur <strong style="color:var(--twitch)">Twitch</strong>.</p>
+
+          <div class="tile tile-twitch" style="margin-bottom:0.75rem;">
+            <h3>TTL = durée de vie du token</h3>
+            <p>
+              <strong>TTL</strong> (Time To Live) = combien de temps la commande reste valide après « Signer ».<br />
+              • Défaut : <strong>60 secondes</strong> — tu as ~1 minute pour coller dans le chat.<br />
+              • Maximum : <strong>180 secondes</strong> (3 min).<br />
+              • Après expiration : plus de redirection (même si le message reste visible dans l’historique).<br />
+              • Chaque clic « Signer » crée un <strong>nouveau</strong> token (ne réutilise pas une vieille commande).
+            </p>
+          </div>
+          <div class="tile tile-kick" style="margin-bottom:0.75rem;">
+            <h3>Collage correct</h3>
+            <p>
+              Il faut <strong>une seule ligne</strong> :
+              <code>TON_TRIGGER</code> + espace + token<br />
+              Ex. <code>#1212# eyJwIjoi…</code><br />
+              ❌ Envoyer le trigger seul, puis le token à part → rien ne se passe.<br />
+              ❌ Mode Anonyme Twitch → désactive-le (<code>/join</code>) avant d’envoyer.
+            </p>
+          </div>
+          <div class="tile tile-twitch" style="margin-bottom:0.85rem;">
+            <h3>Recharger la page Twitch (F5)</h3>
+            <p>
+              Tant que le token n’est pas expiré, un <strong>rechargement</strong> peut
+              réafficher le message du chat et <strong>redéclencher</strong> la bannière → Kick.
+              Ce n’est pas un bug de “clé permanente” : c’est l’historique retraité.
+              Attends la fin du TTL (ou signe un nouveau raid plus tard) pour tester sans redirect.
+            </p>
+          </div>
+
           <label for="url">URL cible</label>
           <input class="kick-focus" id="url" value="${esc(state.cfg.lastUrl || 'https://kick.com/')}" placeholder="https://kick.com/tonpseudo" />
           <div class="row">
             <div>
-              <label for="ttl">Durée du token (sec)</label>
+              <label for="ttl">TTL — durée du token (sec)</label>
               <input id="ttl" type="number" min="1" max="180" value="${esc(String(state.cfg.ttl || 60))}" />
+              <p class="hint">60 = recommandé · max 180</p>
             </div>
             <div>
               <label>Trigger</label>
@@ -528,6 +560,7 @@
             <button type="button" class="btn-kick" id="sign">Signer &amp; copier</button>
           </div>
           <pre class="code hidden" id="cmdOut"></pre>
+          <p class="hint">Après copie : va sur ta chaîne → Ctrl+V → Entrée (une seule fois, ligne complète).</p>
           <div class="actions">
             <button type="button" class="btn-ghost" id="back">Retour</button>
             <button type="button" class="btn-twitch" id="next">Terminer le guide</button>
@@ -539,12 +572,14 @@
         return head + `
           <h2>Tu es prêt</h2>
           <p class="lead">
-            Prochains raids : cet assistant s’ouvrira directement sur l’écran
-            <strong style="color:var(--kick)">Raid</strong>. Le bouton <em>Guide</em> rejoue l’onboarding.
+            Prochains raids : écran <strong style="color:var(--kick)">Raid</strong> direct.
+            Bouton <em>Guide</em> = rejouer l’onboarding.
           </p>
           <ul class="checklist">
-            <li><span class="dot" style="background:var(--twitch)"></span><span>Colle la commande sur ta chaîne Twitch</span></li>
-            <li><span class="dot" style="background:var(--kick)"></span><span>Les viewers voient la bannière → Kick (ou Échap pour annuler)</span></li>
+            <li><span class="dot" style="background:var(--twitch)"></span><span>Lance l’assistant via <code>T2K-Assistant.vbs</code> (sans fenêtre noire) ou le .bat debug</span></li>
+            <li><span class="dot" style="background:var(--kick)"></span><span>Signer &amp; copier → <strong>une ligne</strong> dans le chat (trigger + token)</span></li>
+            <li><span class="dot" style="background:var(--twitch)"></span><span>TTL ~60 s pour coller · F5 peut rejouer le raid tant que le token vit</span></li>
+            <li><span class="dot" style="background:var(--kick)"></span><span>Bannière 3 s → Kick · Échap = annuler</span></li>
           </ul>
           <div class="actions">
             <button type="button" class="btn-kick" id="finish">Aller à l’écran Raid</button>
@@ -560,6 +595,15 @@
         <div class="pill ${pill.cls}">${pill.text}</div>
         <h2>Lancer un raid</h2>
         <p class="lead">Signe une commande pour <strong style="color:var(--twitch)">Twitch</strong>, destination <strong style="color:var(--kick)">Kick</strong>.</p>
+        <div class="tile tile-kick" style="margin-bottom:0.85rem;">
+          <h3>Rappel rapide</h3>
+          <p>
+            • <strong>TTL</strong> = validité du token (défaut 60 s, max 180).<br />
+            • Colle <strong>une seule ligne</strong> : trigger + espace + token.<br />
+            • F5 sur Twitch peut rejouer le raid tant que le TTL n’est pas fini.<br />
+            • Pas de Mode Anonyme · pas de trigger seul sans token.
+          </p>
+        </div>
         <label for="streamer">Login Twitch</label>
         <input id="streamer" value="${esc(state.cfg.streamer || '')}" />
         <div class="row">
@@ -578,7 +622,7 @@
           <button type="button" class="btn-kick" id="sign">Signer &amp; copier</button>
         </div>
         <pre class="code hidden" id="cmdOut"></pre>
-        <p class="hint">Pense à aligner le trigger avec <code>streamers.json</code> après un changement.</p>
+        <p class="hint">Aligner le trigger avec <code>streamers.json</code> après un changement.</p>
         <div class="msg" id="msg"></div>`;
     }
 

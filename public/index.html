@@ -251,6 +251,7 @@
         <li><a href="#roles">Deux rôles : streamer et viewer</a></li>
         <li><a href="#besoin">Ce dont tu as besoin</a></li>
         <li><a href="#pas-a-pas">Pas à pas (streamer)</a></li>
+        <li><a href="#regles">TTL, collage, F5 — règles</a></li>
         <li><a href="#viewer">Si tu es juste un viewer</a></li>
         <li><a href="#bugs">Ça marche pas ?</a></li>
         <li><a href="#fichiers">Où sont les fichiers</a></li>
@@ -428,28 +429,58 @@ cd T2K</code></pre>
       </article>
 
       <article class="step" id="etape-6">
-        <h3>Signe un raid (assistant wizard)</h3>
+        <h3>Signe un raid (assistant)</h3>
         <ol>
-          <li>Double-clic sur <code class="inline">T2K-Raid.bat</code>
-            (ou <code class="inline">npm start</code>)</li>
-          <li>Au premier lancement : <strong>wizard</strong> violet Twitch / vert Kick
-            qui explique chaque étape (logo T2K inclus)</li>
-          <li>Génère tes clés, copie le JSON, charge l’extension</li>
-          <li>Puis écran Raid → <strong>Signer &amp; copier</strong> → colle sur Twitch</li>
+          <li>Double-clic sur <code class="inline">T2K-Assistant.vbs</code>
+            (recommandé : <strong>pas de fenêtre noire</strong>) —
+            ou <code class="inline">T2K-Raid.bat</code> si tu veux voir la console debug</li>
+          <li>Au premier lancement : wizard violet Twitch / vert Kick</li>
+          <li>Génère tes clés, envoie le JSON public au registre, charge l’extension</li>
+          <li>Écran Raid → <strong>Signer &amp; copier</strong> → colle <strong>une seule ligne</strong> sur Twitch</li>
         </ol>
         <p>
-          Les viewers qui ont T2K voient une bannière :
-          « Raid T2K dans 3… ». <strong>Échap</strong> ou <strong>Annuler</strong> = stop.
+          Les viewers voient « Raid T2K dans 3… ». <strong>Échap</strong> = annuler.
         </p>
         <div class="callout">
-          Le <strong>trigger</strong> de l’assistant doit être le même que dans
-          <code class="inline">streamers.json</code>. Exemple :
-          <code class="inline">"trigger": "!go"</code> + champ trigger
-          <code class="inline">!go</code> dans l’UI.
+          Le <strong>trigger</strong> doit être le même que dans
+          <code class="inline">streamers.json</code>.
         </div>
-        <p class="muted">Variante terminal :</p>
-        <pre><code>node cli/sign-raid.js monpseudo "https://kick.com/lacible" --ttl 60 --trigger "!raid"</code></pre>
       </article>
+    </section>
+
+    <section id="regles">
+      <h2>TTL, collage, rechargement — à retenir</h2>
+      <div class="card">
+        <h3 style="margin-top:0">TTL (Time To Live)</h3>
+        <p>
+          C’est la <strong>durée de validité</strong> du token après « Signer &amp; copier ».
+        </p>
+        <ul>
+          <li><strong>Défaut : 60 secondes</strong> — tu as environ 1 minute pour coller dans le chat</li>
+          <li><strong>Maximum : 180 secondes</strong></li>
+          <li>Chaque signature = un <strong>nouveau</strong> token (ne recycle pas une vieille commande)</li>
+          <li>Après expiration : le message peut rester dans l’historique Twitch, mais <strong>ne doit plus</strong> déclencher de raid</li>
+        </ul>
+        <h3>Comment coller</h3>
+        <p>Une <strong>seule</strong> ligne, d’un coup :</p>
+        <pre><code>#1212# eyJwIjoi…token…</code></pre>
+        <p class="muted">
+          Trigger + espace + token. Pas le trigger seul, pas le token sur un 2ᵉ message.
+          Désactive le <strong>Mode Anonyme</strong> Twitch (<code>/join</code>) sinon tu ne peux pas chatter.
+        </p>
+        <h3>Pourquoi F5 me renvoie encore sur Kick ?</h3>
+        <p>
+          Au rechargement, Twitch réaffiche le message du chat. L’extension le retraite
+          comme un nouveau raid <em>tant que le TTL n’est pas fini</em>.
+          Ce n’est pas une clé “permanente” : attends ~1–3 min ou signe un raid plus tard pour retester.
+        </p>
+        <h3>Lancer l’assistant sans stress</h3>
+        <p>
+          Préfère <code class="inline">T2K-Assistant.vbs</code> : le navigateur s’ouvre,
+          <strong>sans console noire</strong>. Le .bat reste utile seulement pour le debug.
+          (Une vraie app fenêtre type Electron/Tauri pourra remplacer ça plus tard.)
+        </p>
+      </div>
     </section>
 
     <section id="viewer">
@@ -498,6 +529,21 @@ cd T2K</code></pre>
             <td>Resigne un raid et colle-le tout de suite</td>
           </tr>
           <tr>
+            <td>Rien après avoir collé</td>
+            <td>Trigger seul, ou token sur une 2ᵉ ligne</td>
+            <td>Une seule ligne : trigger + espace + token</td>
+          </tr>
+          <tr>
+            <td>F5 me renvoie sur Kick</td>
+            <td>Token encore dans le TTL + historique chat</td>
+            <td>Attendre la fin du TTL (~60 s+) avant de recharger</td>
+          </tr>
+          <tr>
+            <td>Mode Anonyme</td>
+            <td>Twitch bloque l’envoi</td>
+            <td><code>/join</code> ou désactiver Anon Chat</td>
+          </tr>
+          <tr>
             <td>Erreur --ttl too large</td>
             <td>TTL &gt; 180</td>
             <td>Utilise 60 (recommandé) ou max 180</td>
@@ -519,7 +565,8 @@ cd T2K</code></pre>
 │   ├── sign-raid.js
 │   ├── raid-app.js       ← assistant navigateur (npm start)
 │   └── keys/             ← SECRETS (jamais sur GitHub)
-├── T2K-Raid.bat          ← double-clic Windows
+├── T2K-Assistant.vbs     ← double-clic recommandé (sans console)
+├── T2K-Raid.bat          ← console debug (optionnel)
 ├── extension/            ← à charger dans Chrome
 │   ├── manifest.json
 │   └── content.js
