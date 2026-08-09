@@ -105,8 +105,11 @@ couvre déjà GitHub Pages).
 ### F. Lancer un raid (assistant local — recommandé)
 
 1. Double-clic sur **`T2K-Raid.bat`** (ou `npm start`)
-2. Le navigateur s’ouvre : renseigne login, **trigger**, URL Kick
-3. **Signer & copier** → colle (Ctrl+V) dans le chat Twitch
+2. Au **premier lancement**, un **wizard d’onboarding** explique tout
+   (rôles, login Twitch, trigger, clés, JSON, extension, premier raid).
+   Design : violet Twitch / vert Kick + logo `logo.png`.
+3. Ensuite : écran **Raid** → URL Kick → **Signer & copier** → colle sur Twitch
+4. Bouton **Guide** pour rejouer l’onboarding
 
 Le trigger choisi doit être **identique** au champ `"trigger"` de ton entrée
 dans `public/streamers.json` (sinon les viewers ne détectent rien).

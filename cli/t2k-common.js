@@ -41,6 +41,7 @@ function t2kDefaultConfig() {
     ttl: T2K_TTL_SEC,
     lastUrl: 'https://kick.com/',
     port: 3847,
+    onboardingComplete: false,
   };
 }
 
@@ -58,6 +59,7 @@ function t2kLoadConfig() {
         .toLowerCase(),
       ttl: Number(raw.ttl) > 0 ? Number(raw.ttl) : base.ttl,
       port: Number(raw.port) > 0 ? Number(raw.port) : base.port,
+      onboardingComplete: Boolean(raw.onboardingComplete),
     };
   } catch {
     return base;
@@ -76,11 +78,50 @@ function t2kSaveConfig(cfg) {
     ),
     lastUrl: String(cfg.lastUrl || 'https://kick.com/'),
     port: Number(cfg.port) > 0 ? Number(cfg.port) : 3847,
+    onboardingComplete: Boolean(cfg.onboardingComplete),
   };
   fs.writeFileSync(T2K_CONFIG_PATH, JSON.stringify(next, null, 2) + '\n', {
     mode: 0o600,
   });
   return next;
+}
+
+function t2kKeyExists(login) {
+  const streamer = String(login || '')
+    .trim()
+    .toLowerCase();
+  if (!streamer) return false;
+  return fs.existsSync(path.join(__dirname, 'keys', `${streamer}_private.pem`));
+}
+
+function t2kGenerateKeys(login) {
+  const streamer = String(login || '')
+    .trim()
+    .toLowerCase();
+  if (!streamer || !/^[a-z0-9_]{1,25}$/.test(streamer)) {
+    throw new Error('Invalid streamer login');
+  }
+  const keysDir = path.join(__dirname, 'keys');
+  fs.mkdirSync(keysDir, { recursive: true });
+  const pemPath = path.join(keysDir, `${streamer}_private.pem`);
+  if (fs.existsSync(pemPath)) {
+    throw new Error(
+      `Private key already exists for ${streamer}. Delete it manually to regenerate.`
+    );
+  }
+  const { privateKey, publicKey } = crypto.generateKeyPairSync('ec', {
+    namedCurve: 'P-384',
+  });
+  fs.writeFileSync(pemPath, privateKey.export({ type: 'pkcs8', format: 'pem' }), {
+    mode: 0o600,
+    flag: 'wx',
+  });
+  const jwk = publicKey.export({ format: 'jwk' });
+  return {
+    streamer,
+    pemPath,
+    publicKey: { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y },
+  };
 }
 
 function t2kSignRaidCommand({ login, url, ttl, trigger }) {
@@ -157,4 +198,6 @@ module.exports = {
   t2kLoadConfig,
   t2kSaveConfig,
   t2kSignRaidCommand,
+  t2kKeyExists,
+  t2kGenerateKeys,
 };
