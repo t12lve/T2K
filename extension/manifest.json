@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "T2K",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Twitch To Kick — phrase discrète, source→cible et timer réglables",
   "icons": {
     "16": "icon.png",

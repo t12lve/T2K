@@ -278,10 +278,14 @@ async function t2kRefreshSettings() {
   t2kSettings = await t2kLoadSettings();
 }
 
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'sync') return;
-  t2kRefreshSettings();
-});
+try {
+  chrome.storage.onChanged.addListener((_changes, area) => {
+    if (area !== 'local') return;
+    t2kRefreshSettings();
+  });
+} catch (err) {
+  console.warn('t2k: storage listener unavailable', err);
+}
 
 (async function t2kMain() {
   await t2kRefreshSettings();
