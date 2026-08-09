@@ -5,6 +5,10 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
+const T2K_TTL_SEC = 60;
+const T2K_DRIFT_SEC = 120;
+const T2K_MAX_TTL_SEC = T2K_TTL_SEC + T2K_DRIFT_SEC; // 180s: extension anti-replay window
+
 function t2kBase64UrlEncode(buf) {
   return Buffer.from(buf)
     .toString('base64')
@@ -26,6 +30,13 @@ function parseArgs(argv) {
       ttl = Number(args[++i]);
       if (!Number.isFinite(ttl) || ttl <= 0) {
         throw new Error('Invalid --ttl');
+      }
+      if (ttl > T2K_MAX_TTL_SEC) {
+        throw new Error(
+          `--ttl too large: ${ttl}s exceeds max ${T2K_MAX_TTL_SEC}s ` +
+            `(extension anti-replay window rejects raids expiring further in ` +
+            `the future than this)`
+        );
       }
     } else {
       positional.push(args[i]);
