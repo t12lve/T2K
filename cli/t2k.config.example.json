@@ -1,8 +1,0 @@
-{
-  "streamer": "",
-  "trigger": "!raid",
-  "ttl": 60,
-  "lastUrl": "https://kick.com/",
-  "port": 3847,
-  "onboardingComplete": false
-}

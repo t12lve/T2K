@@ -1,27 +1,17 @@
 {
   "manifest_version": 3,
   "name": "T2K",
-  "version": "2.0.0",
-  "description": "Twitch To Kick — simple raid: streamer types trigger while live",
-  "permissions": ["storage"],
-  "host_permissions": [
-    "https://www.twitch.tv/*",
-    "https://*.github.io/*"
-  ],
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
+  "version": "3.0.0",
+  "description": "Twitch To Kick — le streamer colle une phrase, les viewers suivent vers Kick",
   "action": {
-    "default_title": "T2K — ouvrir l’onboarding"
+    "default_title": "T2K — phrase raid",
+    "default_popup": "popup.html"
   },
-  "background": {
-    "service_worker": "background.js"
-  },
+  "host_permissions": ["https://www.twitch.tv/*"],
   "content_scripts": [
     {
       "matches": ["https://www.twitch.tv/*"],
-      "js": ["content.js"],
+      "js": ["phrases.js", "content.js"],
       "run_at": "document_idle"
     }
   ]

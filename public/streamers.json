@@ -1,9 +1,0 @@
-{
-  "streamers": {
-    "t12lve": {
-      "displayName": "t12lve",
-      "trigger": "#1212#",
-      "target": "t12lve"
-    }
-  }
-}

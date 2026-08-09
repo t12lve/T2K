@@ -1,19 +1,5 @@
-# Node
+# Node (legacy — plus utilisé)
 node_modules/
-npm-debug.log*
-yarn-error.log*
-
-# T2K secrets — NEVER commit private keys
-cli/keys/
-cli/t2k.config.json
-*.pem
-*private*
-private_key.json
-*_private.json
-
-# Env
-.env
-.env.*
 
 # OS
 .DS_Store
@@ -24,3 +10,11 @@ Desktop.ini
 .idea/
 .vscode/
 *.swp
+
+# Secrets / scratch
+*.pem
+cli/
+.env
+.env.*
+logo.psd
+.superpowers/

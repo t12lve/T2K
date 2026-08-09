@@ -3,15 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>T2K — Tutoriel (mode simple)</title>
-  <meta name="description" content="Raid Twitch vers Kick : le streamer tape un trigger en live, les viewers suivent." />
+  <title>T2K — Tutoriel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0a0a0a; --ink: #f3f3f4; --muted: #9a9aa3; --card: #141416;
-      --line: #2a2a30; --twitch: #9146ff; --kick: #53fc18; --max: 44rem;
+      --line: #2a2a30; --twitch: #9146ff; --kick: #53fc18; --max: 42rem;
     }
     * { box-sizing: border-box; }
     body {
@@ -22,34 +21,30 @@
         var(--bg);
       line-height: 1.6;
     }
-    .wrap { width: min(100% - 2rem, var(--max)); margin: 0 auto; padding: 2rem 0 3.5rem; }
+    .wrap { width: min(100% - 2rem, var(--max)); margin: 0 auto; padding: 2rem 0 3rem; }
     .brand { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.25rem; }
     .brand img { width: 88px; border-radius: 10px; }
-    h1 { font-family: Syne, sans-serif; margin: 0; font-size: clamp(1.8rem, 5vw, 2.4rem); }
-    .tag { color: var(--muted); margin: 0.25rem 0 0; }
-    h2 { font-family: Syne, sans-serif; font-size: 1.35rem; margin: 2rem 0 0.6rem; }
+    h1 { font-family: Syne, sans-serif; margin: 0; font-size: clamp(1.8rem, 5vw, 2.3rem); }
+    .tag { color: var(--muted); margin: 0.2rem 0 0; font-size: 0.95rem; }
+    h2 { font-family: Syne, sans-serif; font-size: 1.3rem; margin: 1.75rem 0 0.55rem; }
     .card {
       background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-      padding: 1rem 1.15rem; margin: 0.85rem 0;
+      padding: 1rem 1.1rem; margin: 0.75rem 0;
     }
     .tw { border-color: rgba(145,70,255,.4); }
     .ki { border-color: rgba(83,252,24,.35); }
     .pill {
-      display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 99px; margin-bottom: 0.5rem;
+      display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 0.22rem 0.5rem; border-radius: 99px; margin-bottom: 0.45rem;
     }
     .pill-tw { background: rgba(145,70,255,.2); color: #c4a0ff; }
     .pill-ki { background: rgba(83,252,24,.14); color: var(--kick); }
-    a { color: var(--kick); }
-    code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
-    pre {
-      background: #060607; color: #d8d8de; padding: 0.85rem 1rem; border-radius: 10px;
-      overflow-x: auto; font-size: 0.88rem;
-    }
-    ol, ul { padding-left: 1.2rem; }
-    li { margin: 0.35rem 0; color: var(--muted); }
+    p, li { color: var(--muted); }
     li strong { color: var(--ink); }
-    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+    ol, ul { padding-left: 1.15rem; }
+    a { color: var(--kick); }
+    code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
   </style>
 </head>
 <body>
@@ -58,87 +53,60 @@
       <img src="https://raw.githubusercontent.com/t12lve/T2K/main/logo.png" alt="T2K" width="88" height="48" />
       <div>
         <h1>T2K</h1>
-        <p class="tag"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span> · mode simple (sans clé)</p>
+        <p class="tag"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span> · phrase simple</p>
       </div>
     </header>
 
     <div class="card tw">
-      <span class="pill pill-tw">Idée</span>
-      <p style="margin:0;color:var(--muted);">
-        Le streamer tape <strong style="color:var(--ink)">uniquement un trigger</strong> dans le chat
-        (ex. <code>#1212#</code>). Les viewers avec l’extension partent vers Kick.
-        <strong style="color:var(--ink)">Pas de token, pas de crypto, pas de .bat.</strong>
+      <span class="pill pill-tw">En une phrase</span>
+      <p style="margin:0;">
+        Le streamer copie une phrase depuis l’extension et la colle dans le chat.
+        Les viewers avec T2K partent vers <strong style="color:var(--kick)">Kick</strong>
+        (<code>kick.com/sonpseudo</code>. Pas de clé, pas d’e-mail, pas de registre.
       </p>
     </div>
 
-    <h2>Sécurité (sans clé)</h2>
+    <h2>Sécurité</h2>
     <div class="card tw">
       <ul>
-        <li>Seul le <strong>streamer</strong> (pseudo / badge broadcaster) peut déclencher.</li>
-        <li>Il doit être <strong>en live</strong> (indicateur live sur la page).</li>
-        <li>Il doit être sur <strong>sa</strong> chaîne source Twitch.</li>
-        <li>La <strong>cible Kick</strong> est définie dans le registre (sinon = même login).</li>
+        <li>Seul le <strong>streamer</strong> (pseudo / badge) déclenche le raid.</li>
+        <li>Il doit être <strong>en live</strong> sur <strong>sa</strong> chaîne.</li>
+        <li>La phrase doit être <strong>exacte</strong> (celle proposée par l’extension).</li>
       </ul>
     </div>
 
-    <h2>Pas à pas streamer</h2>
+    <h2>Streamer</h2>
     <div class="card ki">
-      <span class="pill pill-ki">1 · Config</span>
+      <span class="pill pill-ki">Pendant le live</span>
       <ol>
-        <li>Installe l’extension Chrome (mode développeur → dossier <code>extension/</code>).</li>
-        <li>Clique l’icône T2K → page <strong>Onboarding</strong>.</li>
-        <li>Renseigne : chaîne source Twitch, chaîne cible Kick, trigger.</li>
-        <li>Envoie la config au registre (<a href="mailto:2hellv@gmail.com">2hellv@gmail.com</a>) pour publication dans <code>streamers.json</code>.</li>
+        <li>Installe l’extension (dossier <code>extension/</code> en mode développeur).</li>
+        <li>Clique l’icône <strong>T2K</strong> dans Chrome.</li>
+        <li>Clique <strong>Copier</strong> (ou « Autre phrase »).</li>
+        <li>Colle dans ton chat Twitch — <strong>rien d’autre sur la ligne</strong>.</li>
       </ol>
-    </div>
-    <div class="card tw">
-      <span class="pill pill-tw">2 · Pendant le live</span>
-      <ol>
-        <li>Lance ton live sur <strong>ta</strong> chaîne.</li>
-        <li>Dans le chat, envoie <strong>seulement</strong> le trigger, ex. :</li>
-      </ol>
-      <pre><code>#1212#</code></pre>
-      <p style="color:var(--muted);margin:0.5rem 0 0;">
-        Pas d’URL, pas de token. Une ligne = le trigger. Désactive le Mode Anonyme.
-      </p>
-    </div>
-    <div class="card ki">
-      <span class="pill pill-ki">3 · Viewers</span>
-      <p style="margin:0;color:var(--muted);">
-        Ils installent la même extension et regardent ton live.
-        Bannière 3 s (vert Kick) → redirection. Escape = annuler.
-      </p>
     </div>
 
-    <h2>Exemple registre</h2>
-    <pre><code>{
-  "streamers": {
-    "t12lve": {
-      "displayName": "t12lve",
-      "trigger": "#1212#",
-      "target": "t12lve"
-    }
-  }
-}</code></pre>
-    <p style="color:var(--muted);">
-      Fichier public : <a href="./streamers.json">streamers.json</a>
-      — pas de clé privée dedans.
-    </p>
+    <h2>Viewer</h2>
+    <div class="card tw">
+      <ol>
+        <li>Installe la même extension.</li>
+        <li>Regarde le live Twitch.</li>
+        <li>Quand le streamer colle la phrase : bannière 3 s → Kick (Échap = annuler).</li>
+      </ol>
+    </div>
 
     <h2>Si ça ne marche pas</h2>
     <div class="card">
       <ul>
-        <li>Pas en live / pas sur ta chaîne / pas le streamer qui tape</li>
-        <li>Trigger avec du texte en plus sur la même ligne</li>
-        <li>Pas encore dans <code>streamers.json</code> publié</li>
-        <li>Extension non rechargée après mise à jour</li>
+        <li>Pas en live / pas sur ta chaîne / ce n’est pas toi qui as posté</li>
+        <li>Phrase modifiée (un caractère en trop ou manquant)</li>
+        <li>Extension non chargée / à recharger après mise à jour</li>
+        <li>Pseudo Kick différent de Twitch → la cible sera quand même <code>kick.com/&lt;pseudo_twitch&gt;</code></li>
       </ul>
     </div>
 
     <footer>
-      T2K v2 · mode simple ·
-      <a href="https://github.com/t12lve/T2K">GitHub</a>
-      · l’ancien mode signé (CLI / .bat) reste dans le repo en legacy.
+      <a href="https://github.com/t12lve/T2K">GitHub</a> · extension v3
     </footer>
   </div>
 </body>

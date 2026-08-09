@@ -1,43 +1,31 @@
-# T2K (Twitch To Kick) — mode simple
+# T2K (Twitch To Kick)
 
-Le streamer tape **uniquement un trigger** dans le chat Twitch pendant son live.
-Les viewers avec l’extension voient une bannière puis partent sur Kick.
+Raid simple : le **streamer** copie une phrase depuis l’extension et la colle
+dans son chat Twitch en live. Les **viewers** avec T2K sont redirigés vers
+`https://kick.com/<même_pseudo>`.
 
-**Pas de clé crypto. Pas de token. Pas de .bat obligatoire.**
-
-Tutoriel : **https://t12lve.github.io/T2K/**
+Tutoriel : https://t12lve.github.io/T2K/
 
 ## Comment ça marche
 
-1. Le streamer est **en live** sur **sa** chaîne (source).
-2. Il envoie **seulement** son trigger (ex. `#1212#`).
-3. L’extension vérifie : auteur = streamer + page live + chaîne connue.
-4. Redirection vers `https://kick.com/<cible>` (cible dans le registre, défaut = même login).
+1. Streamer en **live** sur **sa** chaîne Twitch  
+2. Clic icône T2K → **Copier** une phrase aléatoire  
+3. Coller **exactement** cette phrase dans le chat (rien d’autre sur la ligne)  
+4. Viewers : bannière 3 s → Kick (Escape = annuler)
 
-**Sécurité** = « seul le streamer peut taper la commande », pas la cryptographie.
+**Sécurité** : seul le compte streamer (pseudo / badge) déclenche le raid.  
+Pas de clés, pas de registre, pas de token.
 
-## Installation viewer / streamer
+## Installation
 
-1. Chrome → `chrome://extensions` → Mode développeur  
-2. Charger le dossier `extension/`  
-3. Cliquer l’icône **T2K** → onboarding (source, cible Kick, trigger)  
-4. Envoyer la config au registre : **2hellv@gmail.com** (bouton mailto dans l’onboarding)
+1. `chrome://extensions` → Mode développeur  
+2. **Charger l’extension non empaquetée** → dossier `extension/`  
+3. Viewers et streamer installent la même extension
 
-## Registre (`public/streamers.json`)
+## Structure
 
-```json
-{
-  "streamers": {
-    "t12lve": {
-      "displayName": "t12lve",
-      "trigger": "#1212#",
-      "target": "t12lve"
-    }
-  }
-}
 ```
-
-## Legacy (optionnel)
-
-Le dossier `cli/` (signatures ECDSA, wizard Node, `.bat` / `.vbs`) reste disponible
-mais n’est **plus** le parcours principal.
+extension/     ← Chrome MV3 (phrases + popup + content script)
+public/        ← tutoriel GitHub Pages
+logo.png
+```

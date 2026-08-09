@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>T2K</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a; --panel: #141416; --ink: #f3f3f4; --muted: #9a9aa3;
+      --line: #2a2a30; --twitch: #9146ff; --kick: #53fc18;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; width: 320px; font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink); background: var(--bg);
+    }
+    .pad { padding: 0.9rem 1rem 1.1rem; }
+    .brand { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; }
+    .brand img { width: 52px; border-radius: 6px; }
+    h1 { font-family: Syne, sans-serif; font-size: 1.15rem; margin: 0; }
+    .sub { margin: 0.1rem 0 0; font-size: 0.78rem; color: var(--muted); }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+      padding: 0.75rem 0.8rem; margin-bottom: 0.65rem;
+    }
+    .tw { border-color: rgba(145,70,255,.4); }
+    .ki { border-color: rgba(83,252,24,.35); }
+    h2 { font-size: 0.82rem; margin: 0 0 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    p, li { font-size: 0.82rem; color: var(--muted); line-height: 1.45; margin: 0.25rem 0; }
+    ul { margin: 0.2rem 0 0; padding-left: 1rem; }
+    .phrase {
+      margin: 0.35rem 0 0.55rem; padding: 0.65rem 0.7rem; background: #0c0c0e;
+      border-radius: 8px; font-size: 0.9rem; color: var(--ink); line-height: 1.4;
+      border-left: 3px solid var(--twitch); min-height: 2.8rem;
+    }
+    .actions { display: flex; gap: 0.4rem; }
+    button {
+      flex: 1; border: 0; border-radius: 8px; padding: 0.55rem 0.5rem;
+      font: inherit; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+    }
+    .btn-copy { background: var(--kick); color: #0a0a0a; }
+    .btn-new { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    .msg { font-size: 0.78rem; margin-top: 0.45rem; min-height: 1.1em; color: var(--kick); font-weight: 600; }
+    a { color: var(--kick); font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+  <div class="pad">
+    <div class="brand">
+      <img src="logo.png" alt="T2K" width="52" height="28" />
+      <div>
+        <h1>T2K</h1>
+        <p class="sub"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span></p>
+      </div>
+    </div>
+
+    <div class="card tw">
+      <h2>Comment ça marche</h2>
+      <ul>
+        <li>Tu es <strong style="color:var(--ink)">en live</strong> sur <strong style="color:var(--ink)">ta</strong> chaîne Twitch.</li>
+        <li>Tu colles <strong style="color:var(--ink)">une phrase</strong> (ci-dessous) dans le chat.</li>
+        <li>Les viewers avec T2K partent vers <strong style="color:var(--kick)">kick.com/tonpseudo</strong>.</li>
+        <li>Sécurité : seul le <strong style="color:var(--ink)">streamer</strong> peut déclencher.</li>
+      </ul>
+    </div>
+
+    <div class="card ki">
+      <h2>Ta phrase du moment</h2>
+      <div class="phrase" id="phrase">…</div>
+      <div class="actions">
+        <button type="button" class="btn-copy" id="copy">Copier</button>
+        <button type="button" class="btn-new" id="reroll">Autre phrase</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <p style="margin:0;"><a href="https://t12lve.github.io/T2K/" target="_blank" rel="noopener">Tutoriel</a></p>
+  </div>
+  <script src="phrases.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
