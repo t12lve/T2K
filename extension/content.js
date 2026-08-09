@@ -30,6 +30,10 @@ function t2kBytesToUtf8(bytes) {
   return new TextDecoder().decode(bytes);
 }
 
+function t2kNormalizeSignatureKey(s) {
+  return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
 function t2kChannelLogin() {
   const seg = window.location.pathname.split('/').filter(Boolean)[0] || '';
   return seg.toLowerCase();
@@ -154,7 +158,6 @@ function t2kShowBanner(url) {
 }
 
 async function t2kHandleRaidToken(token) {
-  if (t2k_processed_raids.has(token)) return;
   if (!t2kStreamers) return;
 
   let envelope;
@@ -164,6 +167,9 @@ async function t2kHandleRaidToken(token) {
     return;
   }
   if (!envelope || typeof envelope.p !== 'string' || typeof envelope.s !== 'string') return;
+
+  const sigKey = t2kNormalizeSignatureKey(envelope.s);
+  if (t2k_processed_raids.has(sigKey)) return;
 
   let payloadObj;
   let payloadBytes;
@@ -200,6 +206,12 @@ async function t2kHandleRaidToken(token) {
     return;
   }
 
+  // Reserve the anti-replay slot synchronously (no await between the check
+  // above and this add) right before the async verify call, so a second
+  // mutation observed for the same signature while this call is suspended
+  // on await cannot slip past the check and double-fire the raid.
+  t2k_processed_raids.add(sigKey);
+
   let ok = false;
   try {
     const key = await t2kImportPublicKey(entry.publicKey);
@@ -212,9 +224,13 @@ async function t2kHandleRaidToken(token) {
     );
   } catch (e) {
     t2kDebug('verify error', e);
+    t2k_processed_raids.delete(sigKey);
     return;
   }
-  if (!ok) return;
+  if (!ok) {
+    t2k_processed_raids.delete(sigKey);
+    return;
+  }
 
   if (!t2kInReplayWindow(exp)) {
     t2kDebug('expired/out of window');
@@ -222,7 +238,6 @@ async function t2kHandleRaidToken(token) {
   }
   if (!t2kIsHttpsUrl(url)) return;
 
-  t2k_processed_raids.add(token);
   t2kShowBanner(url);
 }
 
