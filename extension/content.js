@@ -1,14 +1,18 @@
 'use strict';
 
-const T2K_STREAMERS_URL =
-  'https://t12lve.github.io/T2K/streamers.json';
-const T2K_DEFAULT_TRIGGER = '!raid';
-const T2K_TTL_SEC = 60;
-const T2K_DRIFT_SEC = 120;
+/**
+ * T2K simple mode:
+ * - Streamer (broadcaster) types ONLY the trigger in chat
+ * - Channel must be live
+ * - Page must be the streamer's channel (source)
+ * - Redirect to https://kick.com/<target> (from registry, default = source login)
+ */
+
+const T2K_STREAMERS_URL = 'https://t12lve.github.io/T2K/streamers.json';
+const T2K_DEFAULT_TRIGGER = '#t2k#';
 const T2K_BANNER_SEC = 3;
 const T2K_REFRESH_MS = 5 * 60 * 1000;
 
-const t2k_processed_raids = new Set();
 let t2kStreamers = null;
 let t2kBannerTimer = null;
 let t2kCountdownTimer = null;
@@ -17,41 +21,36 @@ function t2kDebug(...args) {
   console.debug('t2k:', ...args);
 }
 
-function t2kBase64UrlToBytes(s) {
-  const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
-  const pad = b64 + '==='.slice((b64.length + 3) % 4);
-  const bin = atob(pad);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-
-function t2kBytesToUtf8(bytes) {
-  return new TextDecoder().decode(bytes);
-}
-
-function t2kNormalizeSignatureKey(s) {
-  return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
 function t2kChannelLogin() {
   const seg = window.location.pathname.split('/').filter(Boolean)[0] || '';
   return seg.toLowerCase();
-}
-
-function t2kCanonicalPayload({ exp, streamer, url }) {
-  return JSON.stringify({ exp, streamer, url });
 }
 
 function t2kEscapeRegExp(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function t2kTriggerForChannel() {
+function t2kEntryForChannel() {
   const login = t2kChannelLogin();
-  const entry = t2kStreamers && t2kStreamers[login];
+  if (!t2kStreamers || !t2kStreamers[login]) return null;
+  return { login, entry: t2kStreamers[login] };
+}
+
+function t2kTriggerFor(entry) {
   const t = entry && typeof entry.trigger === 'string' ? entry.trigger.trim() : '';
   return t || T2K_DEFAULT_TRIGGER;
+}
+
+function t2kTargetUrl(login, entry) {
+  const kick =
+    (entry && (entry.target || entry.kick || entry.kickLogin) ) || login;
+  const slug = String(kick)
+    .trim()
+    .replace(/^https?:\/\/(www\.)?kick\.com\//i, '')
+    .split('/')[0]
+    .toLowerCase();
+  if (!slug) return null;
+  return `https://kick.com/${slug}`;
 }
 
 async function t2kFetchStreamers() {
@@ -63,34 +62,131 @@ async function t2kFetchStreamers() {
       t2kStreamers = data.streamers;
     }
   } catch {
-    /* silent fail */
+    /* silent */
   }
 }
 
-async function t2kImportPublicKey(jwk) {
-  return crypto.subtle.importKey(
-    'jwk',
-    jwk,
-    { name: 'ECDSA', namedCurve: 'P-384' },
-    false,
-    ['verify']
+/** Heuristic: channel appears LIVE on the page */
+function t2kIsChannelLive() {
+  const root = document;
+
+  if (root.querySelector('[data-a-target="offline-channel-main"]')) return false;
+
+  const liveSelectors = [
+    '[data-a-target="player-overlay-live"]',
+    '[data-a-player-state="playing"]',
+    '.live-indicator-container',
+    '[class*="LiveStatus"]',
+    'div[aria-label*="Live" i]',
+    'span[aria-label*="Live" i]',
+    'p[data-a-target="animated-channel-viewers-count"]',
+  ];
+  for (const sel of liveSelectors) {
+    try {
+      if (root.querySelector(sel)) return true;
+    } catch {
+      /* ignore invalid */
+    }
+  }
+
+  const indicators = root.querySelectorAll(
+    '[class*="ChannelStatus"], [class*="offline"], [data-a-target*="live"]'
   );
+  for (const el of indicators) {
+    const t = (el.textContent || '').trim().toUpperCase();
+    const aria = (el.getAttribute('aria-label') || '').toUpperCase();
+    if (t === 'LIVE' || aria.includes('LIVE')) return true;
+    if (t.includes('OFFLINE') || aria.includes('OFFLINE')) return false;
+  }
+
+  // Fallback: HLS/video playing on channel page is a weak live signal
+  const video = root.querySelector('video');
+  if (video && !video.paused && video.readyState >= 2) return true;
+
+  return false;
 }
 
-function t2kIsHttpsUrl(urlStr) {
+function t2kNormalizeUser(s) {
+  return String(s || '')
+    .trim()
+    .replace(/^@/, '')
+    .toLowerCase();
+}
+
+function t2kLineHasBroadcasterBadge(line) {
+  const badges = line.querySelectorAll(
+    'img[alt], img[aria-label], div[aria-label], span[aria-label], [data-a-target*="badge"]'
+  );
+  for (const b of badges) {
+    const blob = (
+      (b.getAttribute('alt') || '') +
+      ' ' +
+      (b.getAttribute('aria-label') || '') +
+      ' ' +
+      (b.getAttribute('data-a-target') || '')
+    ).toLowerCase();
+    if (
+      blob.includes('broadcaster') ||
+      blob.includes('streamer') ||
+      blob.includes('diffuseur')
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function t2kExtractAuthor(line) {
+  const tagged = line.querySelector('[data-a-user]');
+  if (tagged) return t2kNormalizeUser(tagged.getAttribute('data-a-user'));
+
+  const nameEl = line.querySelector(
+    '[data-a-target="chat-message-username"], .chat-author__display-name, button[data-a-target="chat-message-username"]'
+  );
+  if (nameEl) return t2kNormalizeUser(nameEl.textContent);
+
+  const link = line.querySelector('a[href^="/"]');
+  if (link) {
+    const href = link.getAttribute('href') || '';
+    const m = href.match(/^\/([A-Za-z0-9_]{1,25})(?:\/|$)/);
+    if (m) return t2kNormalizeUser(m[1]);
+  }
+  return '';
+}
+
+function t2kExtractMessageText(line) {
+  const body = line.querySelector(
+    '[data-a-target="chat-message-text"], [data-a-target="chat-line-message-body"], span.text-fragment'
+  );
+  if (body) return (body.textContent || '').trim();
+
+  // Fallback: clone and strip username button text if possible
+  return (line.textContent || '').trim();
+}
+
+function t2kIsTriggerOnly(text, trigger) {
+  if (!text || !trigger) return false;
+  return text.trim() === trigger;
+}
+
+function t2kSeenKey(channel, author, text) {
+  return `t2k_seen:${channel}:${author}:${text}`;
+}
+
+function t2kAlreadySeen(key) {
   try {
-    const u = new URL(urlStr);
-    return u.protocol === 'https:';
+    return sessionStorage.getItem(key) === '1';
   } catch {
     return false;
   }
 }
 
-function t2kInReplayWindow(exp) {
-  const now = Math.floor(Date.now() / 1000);
-  const min = exp - (T2K_TTL_SEC + T2K_DRIFT_SEC);
-  const max = exp + T2K_DRIFT_SEC;
-  return now >= min && now <= max;
+function t2kMarkSeen(key) {
+  try {
+    sessionStorage.setItem(key, '1');
+  } catch {
+    /* ignore */
+  }
 }
 
 function t2kRemoveBanner() {
@@ -124,13 +220,13 @@ function t2kShowBanner(url) {
     'position:fixed;z-index:2147483647;left:0;right:0;bottom:0;' +
     'display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;' +
     'padding:14px 18px;background:#0e0e10;color:#efeff1;font:14px/1.4 sans-serif;' +
-    'border-top:1px solid #3a3a3d;box-sizing:border-box;';
+    'border-top:2px solid #53fc18;box-sizing:border-box;';
 
   const msg = document.createElement('span');
   msg.id = 't2k-raid-msg';
 
   const urlSpan = document.createElement('span');
-  urlSpan.style.cssText = 'opacity:0.85;word-break:break-all;';
+  urlSpan.style.cssText = 'opacity:0.85;word-break:break-all;color:#53fc18;';
   urlSpan.textContent = url;
 
   const cancel = document.createElement('button');
@@ -168,115 +264,76 @@ function t2kShowBanner(url) {
   }, T2K_BANNER_SEC * 1000);
 }
 
-async function t2kHandleRaidToken(token) {
-  if (!t2kStreamers) return;
+function t2kHandleChatLine(line) {
+  if (!line || line.nodeType !== 1) return;
 
-  let envelope;
-  try {
-    envelope = JSON.parse(t2kBytesToUtf8(t2kBase64UrlToBytes(token)));
-  } catch {
+  const pack = t2kEntryForChannel();
+  if (!pack) {
+    t2kDebug('channel not in registry');
     return;
   }
-  if (!envelope || typeof envelope.p !== 'string' || typeof envelope.s !== 'string') return;
+  const { login, entry } = pack;
+  const trigger = t2kTriggerFor(entry);
+  const text = t2kExtractMessageText(line);
+  if (!t2kIsTriggerOnly(text, trigger)) return;
 
-  const sigKey = t2kNormalizeSignatureKey(envelope.s);
-  if (t2k_processed_raids.has(sigKey)) return;
-
-  let payloadObj;
-  let payloadBytes;
-  try {
-    payloadBytes = t2kBase64UrlToBytes(envelope.p);
-    payloadObj = JSON.parse(t2kBytesToUtf8(payloadBytes));
-  } catch {
-    return;
-  }
-
-  const { exp, streamer, url } = payloadObj;
-  if (typeof exp !== 'number' || typeof streamer !== 'string' || typeof url !== 'string') return;
-
-  const channel = t2kChannelLogin();
-  if (streamer.toLowerCase() !== channel) {
-    t2kDebug('streamer mismatch', streamer, channel);
+  const author = t2kExtractAuthor(line);
+  const isBroadcaster =
+    author === login || t2kLineHasBroadcasterBadge(line);
+  if (!isBroadcaster) {
+    t2kDebug('ignored: not broadcaster', author, login);
     return;
   }
 
-  const entry = t2kStreamers[streamer.toLowerCase()];
-  if (!entry || !entry.publicKey) return;
-
-  const canonical = t2kCanonicalPayload({
-    exp,
-    streamer: streamer.toLowerCase(),
-    url,
-  });
-  const canonicalBytes = new TextEncoder().encode(canonical);
-  if (
-    canonicalBytes.length !== payloadBytes.length ||
-    !canonicalBytes.every((b, i) => b === payloadBytes[i])
-  ) {
-    t2kDebug('non-canonical payload');
+  if (!t2kIsChannelLive()) {
+    t2kDebug('ignored: channel not live');
     return;
   }
 
-  // Reserve the anti-replay slot synchronously (no await between the check
-  // above and this add) right before the async verify call, so a second
-  // mutation observed for the same signature while this call is suspended
-  // on await cannot slip past the check and double-fire the raid.
-  t2k_processed_raids.add(sigKey);
-
-  let ok = false;
-  try {
-    const key = await t2kImportPublicKey(entry.publicKey);
-    const sig = t2kBase64UrlToBytes(envelope.s);
-    ok = await crypto.subtle.verify(
-      { name: 'ECDSA', hash: 'SHA-384' },
-      key,
-      sig,
-      payloadBytes
-    );
-  } catch (e) {
-    t2kDebug('verify error', e);
-    t2k_processed_raids.delete(sigKey);
-    return;
-  }
-  if (!ok) {
-    t2k_processed_raids.delete(sigKey);
+  const url = t2kTargetUrl(login, entry);
+  if (!url || !url.startsWith('https://kick.com/')) {
+    t2kDebug('bad target');
     return;
   }
 
-  if (!t2kInReplayWindow(exp)) {
-    t2kDebug('expired/out of window');
+  const seen = t2kSeenKey(login, author, text);
+  if (t2kAlreadySeen(seen)) {
+    t2kDebug('already seen this session');
     return;
   }
-  if (!t2kIsHttpsUrl(url)) return;
+  t2kMarkSeen(seen);
 
+  t2kDebug('raid ok →', url);
   t2kShowBanner(url);
 }
 
-function t2kScanText(text) {
-  if (!text || !t2kStreamers) return;
-  const trigger = t2kTriggerForChannel();
-  if (!trigger || text.indexOf(trigger) === -1) return;
-  const re = new RegExp(
-    t2kEscapeRegExp(trigger) + '\\s+([A-Za-z0-9_-]+={0,2})'
-  );
-  const m = text.match(re);
-  if (m) t2kHandleRaidToken(m[1]);
+function t2kScanNode(node) {
+  if (!node) return;
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    if (
+      node.matches &&
+      (node.matches('[data-a-target="chat-line-message"]') ||
+        node.matches('.chat-line__message'))
+    ) {
+      t2kHandleChatLine(node);
+    }
+    const lines = node.querySelectorAll
+      ? node.querySelectorAll(
+          '[data-a-target="chat-line-message"], .chat-line__message'
+        )
+      : [];
+    for (const line of lines) t2kHandleChatLine(line);
+  }
 }
 
 function t2kObserveChat() {
   const root = document.documentElement || document.body;
   const obs = new MutationObserver((mutations) => {
     for (const mut of mutations) {
-      for (const node of mut.addedNodes) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          t2kScanText(node.textContent);
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-          t2kScanText(node.textContent);
-        }
-      }
+      for (const node of mut.addedNodes) t2kScanNode(node);
     }
   });
-  obs.observe(root, { childList: true, subtree: true, characterData: true });
+  obs.observe(root, { childList: true, subtree: true });
 }
 
 (async function t2kMain() {

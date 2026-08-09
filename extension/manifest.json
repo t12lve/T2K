@@ -1,13 +1,23 @@
 {
   "manifest_version": 3,
   "name": "T2K",
-  "version": "1.0.0",
-  "description": "Twitch To Kick — signed cross-platform raid redirects",
-  "permissions": ["activeTab", "scripting"],
+  "version": "2.0.0",
+  "description": "Twitch To Kick — simple raid: streamer types trigger while live",
+  "permissions": ["storage"],
   "host_permissions": [
     "https://www.twitch.tv/*",
     "https://*.github.io/*"
   ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "T2K — ouvrir l’onboarding"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.twitch.tv/*"],

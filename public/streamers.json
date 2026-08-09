@@ -1,24 +1,9 @@
 {
   "streamers": {
-    "demostreamer": {
-      "displayName": "demostreamer",
-      "trigger": "!raid",
-      "publicKey": {
-        "kty": "EC",
-        "crv": "P-384",
-        "x": "ey0LmFoarYn09lhUEkcyqOzZxWSls_duRdDqVrYKheNqi3-Uv2WErWFOXxtkAC5a",
-        "y": "a6Bdcks8fdF5NwDpiymDesY_aF95xLxJ3HfHBfYfZaz_veI-gOhMetHSHiidUtRD"
-      }
-    },
     "t12lve": {
       "displayName": "t12lve",
       "trigger": "#1212#",
-      "publicKey": {
-        "kty": "EC",
-        "crv": "P-384",
-        "x": "nuk9c5SeajzFI8-Mq6BDD0RioxQEDytXi412uvJZfqpN4J01vBQyunz15f9Tvg8m",
-        "y": "gPieVEK7jrw10ilNRjkFb10hR0ADvCEu9QHpKacFjVg2EnC-cL91RCgMDbqFBp7T"
-      }
+      "target": "t12lve"
     }
   }
 }

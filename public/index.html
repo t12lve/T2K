@@ -3,592 +3,142 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>T2K — Tutoriel pas à pas (débutant)</title>
-  <meta name="description" content="Tutoriel simple pour utiliser T2K : raid Twitch vers Kick sécurisé, sans jargon." />
+  <title>T2K — Tutoriel (mode simple)</title>
+  <meta name="description" content="Raid Twitch vers Kick : le streamer tape un trigger en live, les viewers suivent." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #eef2f0;
-      --bg-2: #dde5e0;
-      --ink: #14201a;
-      --muted: #45534c;
-      --card: #fbfcfb;
-      --line: #c5d0c9;
-      --accent: #0b6e4f;
-      --accent-2: #0a4d6e;
-      --code-bg: #152019;
-      --code-fg: #e7f0ea;
-      --ok: #0b6e4f;
-      --warn: #7a5b00;
-      --radius: 12px;
-      --shadow: 0 12px 40px rgba(20, 32, 26, 0.08);
-      --max: 46rem;
+      --bg: #0a0a0a; --ink: #f3f3f4; --muted: #9a9aa3; --card: #141416;
+      --line: #2a2a30; --twitch: #9146ff; --kick: #53fc18; --max: 44rem;
     }
-
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
-      font-family: "DM Sans", system-ui, sans-serif;
-      color: var(--ink);
+      margin: 0; font-family: "DM Sans", system-ui, sans-serif; color: var(--ink);
       background:
-        radial-gradient(1200px 500px at 10% -10%, #d5e6de 0%, transparent 55%),
-        radial-gradient(900px 400px at 100% 0%, #d3e0ea 0%, transparent 50%),
+        radial-gradient(900px 400px at 0% 0%, rgba(145,70,255,.22), transparent 55%),
+        radial-gradient(800px 360px at 100% 100%, rgba(83,252,24,.12), transparent 50%),
         var(--bg);
-      line-height: 1.65;
+      line-height: 1.6;
     }
-
-    a { color: var(--accent); }
-    a:hover { color: var(--accent-2); }
-
-    .wrap {
-      width: min(100% - 2rem, var(--max));
-      margin-inline: auto;
-      padding: 2.5rem 0 4rem;
-    }
-
-    header {
-      padding: 2.25rem 0 1.5rem;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 2rem;
-    }
-
-    .brand {
-      font-family: Fraunces, Georgia, serif;
-      font-size: clamp(2.4rem, 6vw, 3.4rem);
-      letter-spacing: -0.03em;
-      margin: 0 0 0.35rem;
-      line-height: 1.05;
-    }
-
-    .tagline {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.1rem;
-      max-width: 36rem;
-    }
-
-    nav.toc {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1rem 1.25rem;
-      margin: 1.75rem 0 2.5rem;
-    }
-
-    nav.toc strong { display: block; margin-bottom: 0.5rem; }
-    nav.toc ol { margin: 0; padding-left: 1.25rem; }
-    nav.toc li { margin: 0.25rem 0; }
-
-    h2 {
-      font-family: Fraunces, Georgia, serif;
-      font-size: 1.65rem;
-      margin: 2.5rem 0 0.75rem;
-      letter-spacing: -0.02em;
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      margin: 1.5rem 0 0.5rem;
-    }
-
-    p, li { color: var(--ink); }
-    .muted { color: var(--muted); }
-
+    .wrap { width: min(100% - 2rem, var(--max)); margin: 0 auto; padding: 2rem 0 3.5rem; }
+    .brand { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 1.25rem; }
+    .brand img { width: 88px; border-radius: 10px; }
+    h1 { font-family: Syne, sans-serif; margin: 0; font-size: clamp(1.8rem, 5vw, 2.4rem); }
+    .tag { color: var(--muted); margin: 0.25rem 0 0; }
+    h2 { font-family: Syne, sans-serif; font-size: 1.35rem; margin: 2rem 0 0.6rem; }
     .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 1.1rem 1.25rem;
-      margin: 1rem 0;
-      box-shadow: var(--shadow);
+      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1rem 1.15rem; margin: 0.85rem 0;
     }
-
-    .callout {
-      border-left: 4px solid var(--accent);
-      padding: 0.85rem 1rem;
-      background: #e7f2ec;
-      border-radius: 0 var(--radius) var(--radius) 0;
-      margin: 1rem 0;
+    .tw { border-color: rgba(145,70,255,.4); }
+    .ki { border-color: rgba(83,252,24,.35); }
+    .pill {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 99px; margin-bottom: 0.5rem;
     }
-
-    .callout.warn {
-      border-left-color: var(--warn);
-      background: #f5efd9;
-    }
-
-    .step {
-      counter-increment: step;
-      position: relative;
-      padding-left: 3.1rem;
-      margin: 2rem 0;
-    }
-
-    .steps { counter-reset: step; }
-
-    .step::before {
-      content: counter(step);
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 2.2rem;
-      height: 2.2rem;
-      border-radius: 999px;
-      background: var(--ink);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-
-    .step h3 { margin-top: 0.15rem; }
-
-    pre, code {
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 0.9rem;
-    }
-
+    .pill-tw { background: rgba(145,70,255,.2); color: #c4a0ff; }
+    .pill-ki { background: rgba(83,252,24,.14); color: var(--kick); }
+    a { color: var(--kick); }
+    code { background: #0c0c0e; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
     pre {
-      background: var(--code-bg);
-      color: var(--code-fg);
-      padding: 1rem 1.1rem;
-      border-radius: var(--radius);
-      overflow-x: auto;
-      margin: 0.75rem 0 0.25rem;
+      background: #060607; color: #d8d8de; padding: 0.85rem 1rem; border-radius: 10px;
+      overflow-x: auto; font-size: 0.88rem;
     }
-
-    code.inline {
-      background: var(--bg-2);
-      padding: 0.1rem 0.35rem;
-      border-radius: 4px;
-      font-size: 0.88em;
-    }
-
-    .copy-hint {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin: 0 0 1rem;
-    }
-
-    .flow {
-      display: grid;
-      gap: 0.6rem;
-      margin: 1rem 0;
-    }
-
-    .flow .box {
-      background: var(--card);
-      border: 1px dashed var(--line);
-      border-radius: var(--radius);
-      padding: 0.85rem 1rem;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .flow .arrow {
-      text-align: center;
-      color: var(--muted);
-      font-size: 1.25rem;
-      line-height: 1;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      font-size: 0.95rem;
-    }
-
-    th, td {
-      border: 1px solid var(--line);
-      padding: 0.6rem 0.7rem;
-      text-align: left;
-      vertical-align: top;
-      background: var(--card);
-    }
-
-    th { background: var(--bg-2); }
-
-    footer {
-      margin-top: 3rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .roles {
-      display: grid;
-      gap: 0.75rem;
-      grid-template-columns: 1fr;
-    }
-
-    @media (min-width: 640px) {
-      .roles { grid-template-columns: 1fr 1fr; }
-    }
+    ol, ul { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; color: var(--muted); }
+    li strong { color: var(--ink); }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <p class="muted" style="margin:0 0 0.5rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; font-size:0.78rem;">Tutoriel débutant</p>
-      <h1 class="brand">T2K</h1>
-      <p class="tagline">
-        Tu ne comprends rien à la crypto ? Pas grave. Ce guide t’explique
-        <strong>comme à un ami</strong> comment faire un raid Twitch → Kick
-        (ou autre site HTTPS) de façon sécurisée.
-      </p>
+    <header class="brand">
+      <img src="https://raw.githubusercontent.com/t12lve/T2K/main/logo.png" alt="T2K" width="88" height="48" />
+      <div>
+        <h1>T2K</h1>
+        <p class="tag"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span> · mode simple (sans clé)</p>
+      </div>
     </header>
 
-    <nav class="toc" aria-label="Sommaire">
-      <strong>Sommaire</strong>
-      <ol>
-        <li><a href="#cest-quoi">C’est quoi T2K ?</a></li>
-        <li><a href="#roles">Deux rôles : streamer et viewer</a></li>
-        <li><a href="#besoin">Ce dont tu as besoin</a></li>
-        <li><a href="#pas-a-pas">Pas à pas (streamer)</a></li>
-        <li><a href="#regles">TTL, collage, F5 — règles</a></li>
-        <li><a href="#viewer">Si tu es juste un viewer</a></li>
-        <li><a href="#bugs">Ça marche pas ?</a></li>
-        <li><a href="#fichiers">Où sont les fichiers</a></li>
-      </ol>
-    </nav>
-
-    <section id="cest-quoi">
-      <h2>C’est quoi T2K ?</h2>
-      <p>
-        Imagine que tu fais un live sur <strong>Twitch</strong> et que tu veux
-        envoyer ton chat vers une autre plateforme (souvent <strong>Kick</strong>).
+    <div class="card tw">
+      <span class="pill pill-tw">Idée</span>
+      <p style="margin:0;color:var(--muted);">
+        Le streamer tape <strong style="color:var(--ink)">uniquement un trigger</strong> dans le chat
+        (ex. <code>#1212#</code>). Les viewers avec l’extension partent vers Kick.
+        <strong style="color:var(--ink)">Pas de token, pas de crypto, pas de .bat.</strong>
       </p>
-      <p>
-        Le problème : n’importe qui pourrait écrire dans le chat
-        <code class="inline">allez tous sur mon-site-chelou.com</code>.
-        Ce serait dangereux.
-      </p>
-      <p>
-        <strong>T2K</strong> règle ça avec une idée simple :
-      </p>
-      <div class="card">
-        Seul <em>toi</em> (le streamer) peux créer un message
-        <code class="inline">!raid …</code> <strong>authentique</strong>,
-        grâce à une « signature » secrète. L’extension des viewers vérifie
-        cette signature avant d’afficher un bouton de redirection.
-      </div>
-      <p class="muted">
-        Analogie : ta clé privée = le tampon de mairie. Ta clé publique =
-        le modèle que tout le monde peut utiliser pour vérifier que le tampon
-        est vrai. Personne ne peut fabriquer ton tampon.
-      </p>
+    </div>
 
-      <div class="flow" aria-hidden="true">
-        <div class="box">1. Tu signes un raid sur ton PC</div>
-        <div class="arrow">↓</div>
-        <div class="box">2. Tu colles !raid dans le chat Twitch</div>
-        <div class="arrow">↓</div>
-        <div class="box">3. L’extension vérifie → bannière 3 secondes</div>
-        <div class="arrow">↓</div>
-        <div class="box">4. Le viewer est redirigé (ou appuie sur Échap pour annuler)</div>
-      </div>
-    </section>
-
-    <section id="roles">
-      <h2>Deux rôles</h2>
-      <div class="roles">
-        <div class="card">
-          <h3 style="margin-top:0">Streamer (toi)</h3>
-          <p class="muted" style="margin:0">
-            Tu installes Node, tu génères tes clés, tu publies ta clé publique,
-            tu signes les raids, tu colles la commande dans ton chat.
-          </p>
-        </div>
-        <div class="card">
-          <h3 style="margin-top:0">Viewer (ton chat)</h3>
-          <p class="muted" style="margin:0">
-            Il installe juste l’extension Chrome T2K. Il n’a pas besoin de clés,
-            ni de Node, ni de ce tutoriel technique.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section id="besoin">
-      <h2>Ce dont tu as besoin (streamer)</h2>
+    <h2>Sécurité (sans clé)</h2>
+    <div class="card tw">
       <ul>
-        <li>Un PC (Windows, Mac ou Linux)</li>
-        <li>Le navigateur <strong>Google Chrome</strong> (ou Chromium / Edge compatible)</li>
-        <li><strong>Node.js</strong> — un logiciel gratuit pour lancer de petits scripts
-          (<a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> → bouton LTS)</li>
-        <li>Le projet T2K (dossier téléchargé depuis GitHub)</li>
-        <li>Environ 15–20 minutes la première fois</li>
+        <li>Seul le <strong>streamer</strong> (pseudo / badge broadcaster) peut déclencher.</li>
+        <li>Il doit être <strong>en live</strong> (indicateur live sur la page).</li>
+        <li>Il doit être sur <strong>sa</strong> chaîne source Twitch.</li>
+        <li>La <strong>cible Kick</strong> est définie dans le registre (sinon = même login).</li>
       </ul>
-      <div class="callout">
-        <strong>Astuce Windows :</strong> après avoir installé Node, ouvre
-        « Invite de commandes » ou « Terminal », tape
-        <code class="inline">node -v</code> puis Entrée.
-        Si tu vois un numéro (ex. <code class="inline">v22.x.x</code>), c’est bon.
-      </div>
-    </section>
+    </div>
 
-    <section id="pas-a-pas" class="steps">
-      <h2>Pas à pas (streamer)</h2>
+    <h2>Pas à pas streamer</h2>
+    <div class="card ki">
+      <span class="pill pill-ki">1 · Config</span>
+      <ol>
+        <li>Installe l’extension Chrome (mode développeur → dossier <code>extension/</code>).</li>
+        <li>Clique l’icône T2K → page <strong>Onboarding</strong>.</li>
+        <li>Renseigne : chaîne source Twitch, chaîne cible Kick, trigger.</li>
+        <li>Envoie la config au registre (<a href="mailto:2hellv@gmail.com">2hellv@gmail.com</a>) pour publication dans <code>streamers.json</code>.</li>
+      </ol>
+    </div>
+    <div class="card tw">
+      <span class="pill pill-tw">2 · Pendant le live</span>
+      <ol>
+        <li>Lance ton live sur <strong>ta</strong> chaîne.</li>
+        <li>Dans le chat, envoie <strong>seulement</strong> le trigger, ex. :</li>
+      </ol>
+      <pre><code>#1212#</code></pre>
+      <p style="color:var(--muted);margin:0.5rem 0 0;">
+        Pas d’URL, pas de token. Une ligne = le trigger. Désactive le Mode Anonyme.
+      </p>
+    </div>
+    <div class="card ki">
+      <span class="pill pill-ki">3 · Viewers</span>
+      <p style="margin:0;color:var(--muted);">
+        Ils installent la même extension et regardent ton live.
+        Bannière 3 s (vert Kick) → redirection. Escape = annuler.
+      </p>
+    </div>
 
-      <article class="step" id="etape-1">
-        <h3>Récupère le projet</h3>
-        <p>Sur GitHub, télécharge le ZIP du dépôt T2K, ou clone-le :</p>
-        <pre><code>git clone https://github.com/t12lve/T2K.git
-cd T2K</code></pre>
-        <p class="copy-hint">Tu dois être « dans » le dossier T2K pour la suite.</p>
-      </article>
-
-      <article class="step" id="etape-2">
-        <h3>Crée tes clés (une seule fois)</h3>
-        <p>
-          Remplace <code class="inline">monpseudo</code> par ton <strong>login Twitch
-          en minuscules</strong> (celui dans l’URL
-          <code class="inline">twitch.tv/monpseudo</code>).
-        </p>
-        <pre><code>node cli/generate-keys.js monpseudo</code></pre>
-        <p>Le script va :</p>
-        <ul>
-          <li>créer un fichier secret
-            <code class="inline">cli/keys/monpseudo_private.pem</code>
-            → <strong>ne le partage JAMAIS</strong>, ne l’envoie à personne ;</li>
-          <li>afficher un bloc JSON « publicKey » à copier.</li>
-        </ul>
-        <div class="callout warn">
-          <strong>Règle d’or :</strong> la clé privée = le code de ta carte bancaire.
-          Si quelqu’un l’a, il peut faire des faux raids en ton nom.
-        </div>
-      </article>
-
-      <article class="step" id="etape-3">
-        <h3>Ajoute ta clé publique dans streamers.json</h3>
-        <p>
-          Ouvre le fichier <code class="inline">public/streamers.json</code>
-          avec un éditeur de texte (Bloc-notes, VS Code…).
-        </p>
-        <p>Colle ton entrée. Exemple de forme :</p>
-        <pre><code>{
+    <h2>Exemple registre</h2>
+    <pre><code>{
   "streamers": {
-    "monpseudo": {
-      "displayName": "MonPseudo",
-      "trigger": "!raid",
-      "publicKey": {
-        "kty": "EC",
-        "crv": "P-384",
-        "x": "…valeurs données par generate-keys…",
-        "y": "…valeurs données par generate-keys…"
-      }
+    "t12lve": {
+      "displayName": "t12lve",
+      "trigger": "#1212#",
+      "target": "t12lve"
     }
   }
 }</code></pre>
-        <p class="muted">
-          Le login (<code class="inline">monpseudo</code>) doit être
-          <strong>exactement</strong> en minuscules, comme dans l’URL Twitch.
-          Tu peux changer <code class="inline">"trigger": "!go"</code> — même
-          valeur dans l’assistant T2K (voir plus bas).
-        </p>
-      </article>
+    <p style="color:var(--muted);">
+      Fichier public : <a href="./streamers.json">streamers.json</a>
+      — pas de clé privée dedans.
+    </p>
 
-      <article class="step" id="etape-4">
-        <h3>Publie streamers.json (déjà prévu sur GitHub Pages)</h3>
-        <p>
-          Ce site (la page que tu lis) est servi avec le dossier
-          <code class="inline">public/</code>. Une fois ton
-          <code class="inline">streamers.json</code> mis à jour et poussé sur
-          GitHub (<code class="inline">main</code>), il sera disponible ici :
-        </p>
-        <pre><code>https://t12lve.github.io/T2K/streamers.json</code></pre>
-        <p>
-          Dans l’extension, l’adresse à configurer dans
-          <code class="inline">extension/content.js</code> doit être :
-        </p>
-        <pre><code>const T2K_STREAMERS_URL =
-  'https://t12lve.github.io/T2K/streamers.json';</code></pre>
-        <div class="callout">
-          Après modification de <code class="inline">content.js</code>, retourne sur
-          <code class="inline">chrome://extensions</code> et clique sur
-          <strong>Actualiser</strong> (icône circulaire) sur T2K.
-        </div>
-      </article>
-
-      <article class="step" id="etape-5">
-        <h3>Installe l’extension Chrome</h3>
-        <ol>
-          <li>Ouvre un nouvel onglet et tape : <code class="inline">chrome://extensions</code></li>
-          <li>Active le <strong>Mode développeur</strong> (en haut à droite)</li>
-          <li>Clique <strong>Charger l’extension non empaquetée</strong></li>
-          <li>Choisis le dossier <code class="inline">extension</code> du projet T2K
-            (celui qui contient <code class="inline">manifest.json</code>)</li>
-        </ol>
-        <p>Tu dois voir apparaître l’extension nommée <strong>T2K</strong>.</p>
-      </article>
-
-      <article class="step" id="etape-6">
-        <h3>Signe un raid (assistant)</h3>
-        <ol>
-          <li>Double-clic sur <code class="inline">T2K-Assistant.vbs</code>
-            (recommandé : <strong>pas de fenêtre noire</strong>) —
-            ou <code class="inline">T2K-Raid.bat</code> si tu veux voir la console debug</li>
-          <li>Au premier lancement : wizard violet Twitch / vert Kick</li>
-          <li>Génère tes clés, envoie le JSON public au registre, charge l’extension</li>
-          <li>Écran Raid → <strong>Signer &amp; copier</strong> → colle <strong>une seule ligne</strong> sur Twitch</li>
-        </ol>
-        <p>
-          Les viewers voient « Raid T2K dans 3… ». <strong>Échap</strong> = annuler.
-        </p>
-        <div class="callout">
-          Le <strong>trigger</strong> doit être le même que dans
-          <code class="inline">streamers.json</code>.
-        </div>
-      </article>
-    </section>
-
-    <section id="regles">
-      <h2>TTL, collage, rechargement — à retenir</h2>
-      <div class="card">
-        <h3 style="margin-top:0">TTL (Time To Live)</h3>
-        <p>
-          C’est la <strong>durée de validité</strong> du token après « Signer &amp; copier ».
-        </p>
-        <ul>
-          <li><strong>Défaut : 60 secondes</strong> — tu as environ 1 minute pour coller dans le chat</li>
-          <li><strong>Maximum : 180 secondes</strong></li>
-          <li>Chaque signature = un <strong>nouveau</strong> token (ne recycle pas une vieille commande)</li>
-          <li>Après expiration : le message peut rester dans l’historique Twitch, mais <strong>ne doit plus</strong> déclencher de raid</li>
-        </ul>
-        <h3>Comment coller</h3>
-        <p>Une <strong>seule</strong> ligne, d’un coup :</p>
-        <pre><code>#1212# eyJwIjoi…token…</code></pre>
-        <p class="muted">
-          Trigger + espace + token. Pas le trigger seul, pas le token sur un 2ᵉ message.
-          Désactive le <strong>Mode Anonyme</strong> Twitch (<code>/join</code>) sinon tu ne peux pas chatter.
-        </p>
-        <h3>Pourquoi F5 me renvoie encore sur Kick ?</h3>
-        <p>
-          Au rechargement, Twitch réaffiche le message du chat. L’extension le retraite
-          comme un nouveau raid <em>tant que le TTL n’est pas fini</em>.
-          Ce n’est pas une clé “permanente” : attends ~1–3 min ou signe un raid plus tard pour retester.
-        </p>
-        <h3>Lancer l’assistant sans stress</h3>
-        <p>
-          Préfère <code class="inline">T2K-Assistant.vbs</code> : le navigateur s’ouvre,
-          <strong>sans console noire</strong>. Le .bat reste utile seulement pour le debug.
-          (Une vraie app fenêtre type Electron/Tauri pourra remplacer ça plus tard.)
-        </p>
-      </div>
-    </section>
-
-    <section id="viewer">
-      <h2>Si tu es juste un viewer</h2>
-      <div class="card">
-        <ol>
-          <li>Demande au streamer le dossier <code class="inline">extension</code>
-            (ou le lien du dépôt GitHub)</li>
-          <li>Chrome → <code class="inline">chrome://extensions</code> → Mode développeur</li>
-          <li>Charger l’extension non empaquetée → dossier <code class="inline">extension</code></li>
-          <li>Regarde le live. Quand un vrai <code class="inline">!raid</code> arrive,
-            une bannière apparaît. Tu as 3 secondes pour annuler.</li>
-        </ol>
-        <p class="muted" style="margin-bottom:0">
-          Tu n’as pas besoin de générer de clés. Si la bannière n’apparaît jamais,
-          le streamer n’a peut‑être pas encore publié sa clé publique, ou
-          l’URL dans l’extension est encore le placeholder.
-        </p>
-      </div>
-    </section>
-
-    <section id="bugs">
-      <h2>Ça marche pas ?</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Symptôme</th>
-            <th>Cause fréquente</th>
-            <th>Que faire</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Rien ne se passe après !raid</td>
-            <td>Mauvaise URL JSON, ou login ≠ URL Twitch</td>
-            <td>Vérifie <code class="inline">T2K_STREAMERS_URL</code>, recharge l’extension, login en minuscules</td>
-          </tr>
-          <tr>
-            <td>« Missing private key »</td>
-            <td>Tu n’as pas lancé generate-keys, ou mauvais login</td>
-            <td>Relance generate-keys avec le bon pseudo</td>
-          </tr>
-          <tr>
-            <td>Token rejeté / rien</td>
-            <td>Trop lent : le token a expiré</td>
-            <td>Resigne un raid et colle-le tout de suite</td>
-          </tr>
-          <tr>
-            <td>Rien après avoir collé</td>
-            <td>Trigger seul, ou token sur une 2ᵉ ligne</td>
-            <td>Une seule ligne : trigger + espace + token</td>
-          </tr>
-          <tr>
-            <td>F5 me renvoie sur Kick</td>
-            <td>Token encore dans le TTL + historique chat</td>
-            <td>Attendre la fin du TTL (~60 s+) avant de recharger</td>
-          </tr>
-          <tr>
-            <td>Mode Anonyme</td>
-            <td>Twitch bloque l’envoi</td>
-            <td><code>/join</code> ou désactiver Anon Chat</td>
-          </tr>
-          <tr>
-            <td>Erreur --ttl too large</td>
-            <td>TTL &gt; 180</td>
-            <td>Utilise 60 (recommandé) ou max 180</td>
-          </tr>
-          <tr>
-            <td>Redirect vers un mauvais site</td>
-            <td>—</td>
-            <td>Impossible si la vérif marche : l’URL est dans le message signé. Si doute, annule (Échap) et désinstalle l’extension</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section id="fichiers">
-      <h2>Où sont les fichiers (carte mentale)</h2>
-      <pre><code>T2K/
-├── cli/                  ← outils sur TON PC
-│   ├── generate-keys.js
-│   ├── sign-raid.js
-│   ├── raid-app.js       ← assistant navigateur (npm start)
-│   └── keys/             ← SECRETS (jamais sur GitHub)
-├── T2K-Assistant.vbs     ← double-clic recommandé (sans console)
-├── T2K-Raid.bat          ← console debug (optionnel)
-├── extension/            ← à charger dans Chrome
-│   ├── manifest.json
-│   └── content.js
-└── public/               ← site GitHub Pages (cette page + streamers.json)
-    ├── index.html        ← ce tutoriel
-    └── streamers.json    ← clés publiques + trigger</code></pre>
-      <p>
-        Doc technique plus détaillée :
-        <a href="https://github.com/t12lve/T2K">dépôt GitHub</a>
-        (fichier README).
-      </p>
-    </section>
+    <h2>Si ça ne marche pas</h2>
+    <div class="card">
+      <ul>
+        <li>Pas en live / pas sur ta chaîne / pas le streamer qui tape</li>
+        <li>Trigger avec du texte en plus sur la même ligne</li>
+        <li>Pas encore dans <code>streamers.json</code> publié</li>
+        <li>Extension non rechargée après mise à jour</li>
+      </ul>
+    </div>
 
     <footer>
-      <p>
-        T2K — Twitch To Kick · tutoriel débutant ·
-        <a href="./streamers.json">streamers.json</a>
-      </p>
-      <p class="muted">
-        Aucun tracker. Aucune pub. L’extension ne fait confiance qu’à la
-        cryptographie, pas au « look » du chat.
-      </p>
+      T2K v2 · mode simple ·
+      <a href="https://github.com/t12lve/T2K">GitHub</a>
+      · l’ancien mode signé (CLI / .bat) reste dans le repo en legacy.
     </footer>
   </div>
 </body>

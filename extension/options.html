@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>T2K — Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a; --panel: #141416; --ink: #f2f2f4; --muted: #9b9ba3;
+      --line: #2c2c32; --twitch: #9146ff; --kick: #53fc18; --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(700px 320px at 0% 0%, rgba(145,70,255,.25), transparent 55%),
+        radial-gradient(600px 280px at 100% 100%, rgba(83,252,24,.12), transparent 50%),
+        var(--bg);
+      padding: 1.25rem;
+    }
+    .wrap { max-width: 34rem; margin: 0 auto; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .brand img { width: 64px; border-radius: 8px; }
+    h1 { font-family: Syne, sans-serif; margin: 0; font-size: 1.5rem; }
+    .sub { color: var(--muted); margin: 0.2rem 0 0; font-size: 0.9rem; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 1.1rem 1.2rem; margin-bottom: 0.85rem;
+    }
+    .card.tw { border-color: rgba(145,70,255,.45); }
+    .card.ki { border-color: rgba(83,252,24,.4); }
+    h2 { font-size: 1.05rem; margin: 0 0 0.45rem; }
+    p, li { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+    ul { padding-left: 1.1rem; margin: 0.4rem 0; }
+    label { display: block; font-weight: 600; font-size: 0.85rem; margin: 0.7rem 0 0.3rem; color: var(--ink); }
+    input {
+      width: 100%; padding: 0.6rem 0.7rem; border-radius: 8px; border: 1px solid var(--line);
+      background: #0c0c0e; color: var(--ink); font: inherit;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
+    button, .btn {
+      appearance: none; border: 0; border-radius: 8px; padding: 0.65rem 0.9rem;
+      font: inherit; font-weight: 700; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center;
+    }
+    .btn-tw { background: var(--twitch); color: #fff; }
+    .btn-ki { background: var(--kick); color: #0a0a0a; }
+    .btn-gh { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+    .preview {
+      margin-top: 0.75rem; padding: 0.65rem 0.75rem; background: #0c0c0e;
+      border-radius: 8px; font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem;
+      color: var(--kick); word-break: break-all;
+    }
+    .ok { color: var(--kick); font-weight: 600; font-size: 0.88rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="brand">
+      <img src="logo.png" id="logo" alt="T2K" width="64" height="36" />
+      <div>
+        <h1>T2K</h1>
+        <p class="sub"><span style="color:var(--twitch)">Twitch</span> → <span style="color:var(--kick)">Kick</span> · mode simple</p>
+      </div>
+    </header>
+
+    <section class="card tw">
+      <h2>Comment ça marche</h2>
+      <ul>
+        <li><strong style="color:var(--ink)">Sans clé crypto</strong> — le streamer tape <em>uniquement</em> son trigger dans le chat.</li>
+        <li><strong style="color:var(--ink)">Sécurité</strong> = seul le <strong>streamer</strong> (badge / pseudo) peut déclencher le raid.</li>
+        <li>Il doit être <strong style="color:var(--ink)">en live</strong> sur <strong style="color:var(--ink)">sa</strong> chaîne Twitch (source).</li>
+        <li>Les viewers avec l’extension voient une bannière 3 s puis partent vers Kick (cible).</li>
+      </ul>
+    </section>
+
+    <section class="card ki">
+      <h2>1. Définis source &amp; cible</h2>
+      <label for="source">Chaîne source (login Twitch)</label>
+      <input id="source" placeholder="t12lve" autocomplete="off" />
+      <label for="target">Chaîne cible (login Kick)</label>
+      <input id="target" placeholder="même pseudo ou autre" autocomplete="off" />
+      <label for="trigger">Trigger (commande seule dans le chat)</label>
+      <input id="trigger" placeholder="#t2k#" autocomplete="off" />
+      <p class="preview" id="preview">Sur twitch.tv/… → tape : … → kick.com/…</p>
+      <div class="actions">
+        <button type="button" class="btn-tw" id="saveLocal">Sauver en local</button>
+        <a class="btn-ki" id="mailto" href="#">Envoyer au registre (e-mail)</a>
+      </div>
+      <p class="ok" id="msg" hidden></p>
+      <p style="margin-top:0.75rem;font-size:0.82rem;">
+        L’extension lit le registre public
+        <code>streamers.json</code>. Envoie ta config à
+        <strong>2hellv@gmail.com</strong> pour être ajouté — sans ça, les viewers
+        ne connaissent pas ton trigger / ta cible.
+      </p>
+    </section>
+
+    <section class="card tw">
+      <h2>2. Côté viewers</h2>
+      <ul>
+        <li>Installer cette extension (mode développeur → dossier <code>extension/</code>).</li>
+        <li>Regarder ton live Twitch.</li>
+        <li>Quand tu tapes le trigger, bannière → Kick.</li>
+      </ul>
+    </section>
+
+    <section class="card ki">
+      <h2>3. Pendant le live</h2>
+      <ul>
+        <li>Sois <strong style="color:var(--ink)">en direct</strong> (badge live).</li>
+        <li>Sur <strong style="color:var(--ink)">ta</strong> chaîne source.</li>
+        <li>Envoie <strong style="color:var(--ink)">uniquement</strong> le trigger (rien d’autre sur la ligne).</li>
+        <li>Exemple : <code id="exTrigger">#t2k#</code></li>
+      </ul>
+      <div class="actions">
+        <a class="btn-gh" href="https://t12lve.github.io/T2K/" target="_blank" rel="noopener">Tutoriel web</a>
+      </div>
+    </section>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
